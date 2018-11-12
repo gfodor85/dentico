@@ -46,9 +46,10 @@
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
+
     <?php include 'partials/navigation.php';?>
 
-    <header>
+    <header id="home">
         
         <div class="hero-img_container">
             <svg class="hero-img">
@@ -63,7 +64,9 @@
 
     </header>
 
-    <section class="container treatment_type_container">
+    <!-- <div class="slider" id="panel">Hello world!</div> -->
+
+    <div class="container treatment_type_container slider">
         <div class="row">
             <div class="col-lg-4" data-toggle="modal" data-target="#general_care">
                     <div class="treatment_type_col">
@@ -94,14 +97,8 @@
                         <img src="assets/img/restorative_dentistry.png">
                     </div>
             </div>
-
-            
-            
         </div>
-
-        
-
-    </section>
+    </div>
 
     <!-- About Us -->
 
@@ -109,7 +106,7 @@
         <div class="container">
             <div class="row">
 
-                <div class="col-md-12 about_content">
+                <div class="col-md-12 about_content hideme">
                     
                     <h4 class="text-center">About Us<hr class="default-hr"></h4>
                     
@@ -172,7 +169,7 @@
             <h4 class="text-center">Our Prices<hr class="default-hr"></h4>
             <div class="row">
                 
-              <div class="col-lg-6">
+              <div class="col-lg-6 prices_slide_left">
                   <table class="table table-hover borderless">
                       <tbody>
                           <tr>
@@ -199,7 +196,7 @@
                   </table>
             </div>
                 
-                <div class="col-lg-6">
+                <div class="col-lg-6 prices_slide_right">
                       <table class="table table-hover borderless">
                         
                         <tbody>
@@ -259,9 +256,10 @@
         <span>Dentico © <?php echo date(" Y");?> All Rights Reserved by George Fodor</span>
     </footer>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <!-- Bootstrap 4 scripts -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
@@ -271,8 +269,11 @@
  <!-- Swiper JS -->
  <script src='https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.1.0/js/swiper.min.js'></script>
  
- <!-- Change nav background on scroll -->
- <script src='assets/js/nav-bg.js'></script>
+ <!-- Navigation scripts -->
+ <script src='assets/js/nav.js'></script>
+ 
+ <!-- Functions scripts -->
+ <script src='assets/js/functions.js'></script>
 
 <!-- Initialize Swiper -->
 <script>
