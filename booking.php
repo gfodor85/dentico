@@ -104,6 +104,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
             $errors[] = 'Please choose a start time between 08:00 and 16:59, Monday to Friday.';
         } elseif ($requestedStart % 15 !== 0) {
             $errors[] = 'Please choose one of the available 15-minute start times.';
+        } elseif (
+            $form['requested_date'] === date('Y-m-d')
+            && $requestedStart <= (((int) date('H') * 60) + (int) date('i'))
+        ) {
+            $errors[] = 'Please choose a start time that is still in the future.';
         }
     }
 
