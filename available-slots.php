@@ -68,8 +68,17 @@ try {
     $duration = (int) $service['duration_minutes'];
     $slots = [];
 
+    // Use the same PHP/server timezone as date() elsewhere in this endpoint.
+    $today = date('Y-m-d');
+    $currentMinutes = ((int) date('H') * 60) + (int) date('i');
+
     // Offer start times every 15 minutes, provided the full service fits before 17:00.
+    // For today, only show start times that are still in the future.
     for ($start = 8 * 60; $start + $duration <= 17 * 60; $start += 15) {
+        if ($dateValue === $today && $start <= $currentMinutes) {
+            continue;
+        }
+
         $overlaps = false;
 
         foreach ($busyIntervals as $busy) {
