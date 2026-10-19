@@ -218,7 +218,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
             min-height: 100vh;
             margin: 0;
             padding: 0;
-            background: #f3f6fa url("assets/img/bg_2_blurred.jpg") center center / cover fixed no-repeat !important;
+            background: #f3f6fa !important;
             color: #212529 !important;
             font-family: Arial, sans-serif !important;
             overflow-x: hidden;
@@ -245,7 +245,12 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
             min-height: 100vh;
             margin: 0;
             padding: 3rem 24px;
-            background: rgba(243, 246, 250, 0.78);
+            background-color: rgba(243, 246, 250, 0.78);
+            background-image: url("assets/img/bg_2_blurred.jpg");
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             color: #212529;
         }
         .admin-panel {
