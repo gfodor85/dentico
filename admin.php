@@ -257,7 +257,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
             padding: 1.5rem;
             border: 1px solid #d7dee7;
             border-radius: .5rem;
-            background: rgba(255, 255, 255, 0.82);
+            background: rgba(255, 255, 255, 0.60) !important;
             color: #212529;
         }
         .request-card {
@@ -265,7 +265,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
             border-radius: .4rem;
             padding: 1rem;
             margin-bottom: 1rem;
-            background: rgba(255, 255, 255, 0.82);
+            background: rgba(255, 255, 255, 0.60) !important;
             color: #212529;
         }
         .request-meta { color: #495057 !important; font-size: .9rem; }
