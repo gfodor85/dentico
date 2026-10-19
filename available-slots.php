@@ -6,7 +6,7 @@ require_once __DIR__ . '/app/database.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
-function sendSlotsResponse(array $payload, int $statusCode = 200): never
+function sendSlotsResponse(array $payload, int $statusCode = 200): void
 {
     http_response_code($statusCode);
     echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
