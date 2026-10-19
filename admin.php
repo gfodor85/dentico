@@ -28,6 +28,20 @@ unset($_SESSION['admin_flash']);
 $requests = [];
 $databaseError = false;
 
+// The calendar defaults to the current week; ?week=YYYY-MM-DD selects another week.
+$requestedWeek = isset($_GET['week']) && is_string($_GET['week']) ? $_GET['week'] : '';
+$weekDate = DateTimeImmutable::createFromFormat('!Y-m-d', $requestedWeek);
+$weekDateErrors = DateTimeImmutable::getLastErrors();
+$validWeekDate = $weekDate !== false
+    && ($weekDateErrors === false || ($weekDateErrors['warning_count'] === 0 && $weekDateErrors['error_count'] === 0))
+    && $weekDate->format('Y-m-d') === $requestedWeek;
+$weekDate = $validWeekDate ? $weekDate : new DateTimeImmutable('today');
+$weekStart = $weekDate->modify('monday this week');
+$weekEnd = $weekStart->modify('+6 days');
+$previousWeek = $weekStart->modify('-7 days')->format('Y-m-d');
+$nextWeek = $weekStart->modify('+7 days')->format('Y-m-d');
+$confirmedByDate = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
     $token = isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])
         ? $_POST['csrf_token']
@@ -173,6 +187,14 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                 ar.requested_date ASC, ar.requested_time ASC, ar.id DESC'
         );
         $requests = $statement->fetchAll();
+
+        foreach ($requests as $request) {
+            if ($request['status'] === 'confirmed'
+                && $request['requested_date'] >= $weekStart->format('Y-m-d')
+                && $request['requested_date'] <= $weekEnd->format('Y-m-d')) {
+                $confirmedByDate[$request['requested_date']][] = $request;
+            }
+        }
     } catch (Throwable $exception) {
         error_log('Dentico admin list error: ' . $exception->getMessage());
         $databaseError = true;
@@ -246,13 +268,51 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                 </form>
             </div>
 
+            <section class="admin-panel mb-4" aria-labelledby="weekly-calendar-heading">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="h4 mb-1" id="weekly-calendar-heading">Weekly calendar</h2>
+                        <p class="text-muted mb-0"><?= $weekStart->format('M j, Y') ?> – <?= $weekEnd->format('M j, Y') ?></p>
+                    </div>
+                    <nav class="btn-group btn-group-sm mt-2" aria-label="Calendar week navigation">
+                        <a class="btn btn-outline-secondary" href="admin.php?week=<?= adminEscape($previousWeek) ?>">&larr; Previous</a>
+                        <a class="btn btn-outline-secondary" href="admin.php">This week</a>
+                        <a class="btn btn-outline-secondary" href="admin.php?week=<?= adminEscape($nextWeek) ?>">Next &rarr;</a>
+                    </nav>
+                </div>
+                <p class="small text-muted">Confirmed appointments only. Opening hours: Monday–Friday, 08:00–17:00.</p>
+                <div class="row">
+                    <?php for ($dayOffset = 0; $dayOffset < 5; $dayOffset++): ?>
+                        <?php $calendarDay = $weekStart->modify('+' . $dayOffset . ' days'); ?>
+                        <?php $calendarDate = $calendarDay->format('Y-m-d'); ?>
+                        <div class="col-md-6 col-lg mb-3">
+                            <div class="border rounded p-2 h-100">
+                                <h3 class="h6 mb-2"><?= $calendarDay->format('D, M j') ?></h3>
+                                <?php if (empty($confirmedByDate[$calendarDate])): ?>
+                                    <p class="small text-muted mb-0">No confirmed appointments</p>
+                                <?php else: ?>
+                                    <?php foreach ($confirmedByDate[$calendarDate] as $calendarRequest): ?>
+                                        <div class="alert alert-success p-2 mb-2">
+                                            <strong><?= substr((string) $calendarRequest['requested_time'], 0, 5) ?></strong>
+                                            <div class="small"><?= adminEscape($calendarRequest['patient_name']) ?></div>
+                                            <div class="small"><?= adminEscape($calendarRequest['service_name']) ?> · <?= (int) $calendarRequest['duration_minutes'] ?> min</div>
+                                            <a class="small" href="#request-<?= (int) $calendarRequest['id'] ?>">View request</a>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endfor; ?>
+                </div>
+            </section>
+
             <?php if ($databaseError): ?>
                 <div class="alert alert-danger" role="alert">The requests could not be loaded. Check the local database connection.</div>
             <?php elseif ($requests === []): ?>
                 <div class="alert alert-info" role="status">There are no appointment requests yet.</div>
             <?php else: ?>
                 <?php foreach ($requests as $request): ?>
-                    <article class="request-card">
+                    <article class="request-card" id="request-<?= (int) $request['id'] ?>">
                         <div class="d-flex flex-wrap justify-content-between align-items-start">
                             <h2 class="h5">Request #<?= (int) $request['id'] ?> — <?= adminEscape($request['patient_name']) ?></h2>
                             <span class="badge badge-<?= $request['status'] === 'confirmed' ? 'success' : ($request['status'] === 'cancelled' ? 'secondary' : 'warning') ?>">
