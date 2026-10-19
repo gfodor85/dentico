@@ -7,3 +7,7 @@
 .env.*
 !.env.example
 *.log
+
+# Local-only SMTP credentials
+/config/mail.php
+/vendor/
