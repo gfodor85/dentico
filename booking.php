@@ -102,6 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
 
         if ($requestedStart < 8 * 60 || $requestedStart >= 17 * 60) {
             $errors[] = 'Please choose a start time between 08:00 and 16:59, Monday to Friday.';
+        } elseif ($requestedStart % 15 !== 0) {
+            $errors[] = 'Please choose one of the available 15-minute start times.';
         }
     }
 
@@ -122,6 +124,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
 
                 if ($startMinutes < 8 * 60 || $endMinutes > 17 * 60) {
                     $errors[] = 'The selected service must start at or after 08:00 and finish by 17:00.';
+                } else {
+                    // Recheck availability on submission in case another appointment was confirmed
+                    // after the visitor loaded the available-times list.
+                    $busyStatement = $pdo->prepare(
+                        'SELECT ar.requested_time, s.duration_minutes
+                         FROM appointment_requests ar
+                         INNER JOIN services s ON s.id = ar.service_id
+                         WHERE ar.requested_date = :requested_date
+                           AND ar.status = "confirmed"'
+                    );
+                    $busyStatement->execute(['requested_date' => $form['requested_date']]);
+
+                    foreach ($busyStatement->fetchAll() as $busyAppointment) {
+                        $busyStart = (int) substr((string) $busyAppointment['requested_time'], 0, 2) * 60
+                            + (int) substr((string) $busyAppointment['requested_time'], 3, 2);
+                        $busyEnd = $busyStart + (int) $busyAppointment['duration_minutes'];
+
+                        if ($startMinutes < $busyEnd && $busyStart < $endMinutes) {
+                            $errors[] = 'That time is no longer available because it overlaps with a confirmed appointment. Please choose another time.';
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -245,9 +269,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
                         <input class="form-control" id="requested_date" name="requested_date" type="date" min="<?= date('Y-m-d') ?>" value="<?= bookingEscape($form['requested_date']) ?>" required>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="requested_time">Preferred time</label>
-                        <input class="form-control" id="requested_time" name="requested_time" type="time" min="08:00" max="16:59" value="<?= bookingEscape($form['requested_time']) ?>" required>
-                        <small class="form-text text-muted">The selected service must finish by 17:00.</small>
+                        <label for="requested_time">Available time</label>
+                        <select class="form-control" id="requested_time" name="requested_time" required disabled>
+                            <option value="">Choose a service and date first</option>
+                        </select>
+                        <small id="availability_message" class="form-text text-muted" aria-live="polite">Choose a service and date to see available times. Times are shown in 15-minute increments.</small>
                     </div>
                 </div>
 
@@ -261,5 +287,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
             </form>
         <?php endif; ?>
     </main>
+    <?php if (!$databaseError && $services !== []): ?>
+    <script>
+    (() => {
+        const serviceSelect = document.getElementById('service_id');
+        const dateInput = document.getElementById('requested_date');
+        const timeSelect = document.getElementById('requested_time');
+        const availabilityMessage = document.getElementById('availability_message');
+        const initiallySelectedTime = <?= json_encode($form['requested_time'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+
+        function setPlaceholder(message) {
+            timeSelect.replaceChildren();
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = message;
+            timeSelect.appendChild(option);
+            timeSelect.disabled = true;
+        }
+
+        async function loadAvailableTimes(preserveSelection = false) {
+            const serviceId = serviceSelect.value;
+            const date = dateInput.value;
+            const previousTime = preserveSelection ? initiallySelectedTime : '';
+
+            if (!serviceId || !date) {
+                setPlaceholder('Choose a service and date first');
+                availabilityMessage.textContent = 'Choose a service and date to see available times.';
+                return;
+            }
+
+            setPlaceholder('Loading available times…');
+            availabilityMessage.textContent = 'Checking availability…';
+
+            try {
+                const params = new URLSearchParams({ service_id: serviceId, date });
+                const response = await fetch('available-slots.php?' + params.toString(), {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store'
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Available times could not be loaded.');
+                }
+
+                timeSelect.replaceChildren();
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = result.slots.length
+                    ? 'Choose an available time'
+                    : 'No available times';
+                timeSelect.appendChild(placeholder);
+
+                result.slots.forEach((slot) => {
+                    const option = document.createElement('option');
+                    option.value = slot;
+                    option.textContent = slot;
+                    if (previousTime && previousTime === slot) {
+                        option.selected = true;
+                    }
+                    timeSelect.appendChild(option);
+                });
+
+                timeSelect.disabled = result.slots.length === 0;
+                availabilityMessage.textContent = result.message
+                    || 'The full service duration must fit before 17:00. Only confirmed appointments block a time.';
+            } catch (error) {
+                setPlaceholder('Availability unavailable');
+                availabilityMessage.textContent = error.message || 'Available times could not be loaded. Please reload the page.';
+            }
+        }
+
+        serviceSelect.addEventListener('change', () => loadAvailableTimes());
+        dateInput.addEventListener('change', () => loadAvailableTimes());
+        loadAvailableTimes(true);
+    })();
+    </script>
+    <?php endif; ?>
 </body>
 </html>
