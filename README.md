@@ -28,7 +28,7 @@ The initial schema is in `database/schema.sql`. To apply it locally:
 5. Open the `services` table and confirm that the three example services were added.
 6. Confirm that the `appointment_requests` table exists.
 
-The example services are placeholders. Edit them to match the actual clinic before using the booking form publicly. Appointment requests are initially saved with a `pending` status; availability validation and conflict prevention will be implemented in the application layer.
+The example services are placeholders. Edit them to match the actual clinic before using the booking form publicly. The current sample opening hours are Monday–Friday, 08:00–17:00. New requests outside these hours are rejected, including requests whose service duration would extend beyond 17:00. Requests are initially saved with a `pending` status. The admin page checks opening hours and prevents overlapping confirmed appointments when a request is confirmed. This is an initial local-development implementation; review concurrency and operational requirements before public production use.
 
 ## Development workflow
 
