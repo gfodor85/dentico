@@ -99,13 +99,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
     if ($errors === []) {
         try {
             $serviceCheck = $pdo->prepare(
-                'SELECT id FROM services WHERE id = :id AND is_active = 1'
+                'SELECT id, duration_minutes FROM services WHERE id = :id AND is_active = 1'
             );
             $serviceCheck->execute(['id' => $serviceId]);
+            $selectedService = $serviceCheck->fetch();
 
-            if (!$serviceCheck->fetch()) {
+            if (!$selectedService) {
                 $errors[] = 'That service is no longer available. Please select another service.';
             } else {
+                $startMinutes = (int) substr($form['requested_time'], 0, 2) * 60
+                    + (int) substr($form['requested_time'], 3, 2);
+                $endMinutes = $startMinutes + (int) $selectedService['duration_minutes'];
+
+                if ($startMinutes < 8 * 60 || $endMinutes > 17 * 60) {
+                    $errors[] = 'The selected service must start at or after 08:00 and finish by 17:00.';
+                }
+            }
+
+            if ($errors === []) {
                 $insert = $pdo->prepare(
                     'INSERT INTO appointment_requests
                         (service_id, patient_name, email, phone, requested_date, requested_time, message)
@@ -161,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
         <p><a href="index.php">&larr; Back to Dentico homepage</a></p>
         <header class="mb-4">
             <h1>Request an Appointment</h1>
-            <p class="booking-note">Send us your preferred date and time. The clinic will contact you to confirm the appointment.</p>
+            <p class="booking-note">Opening hours: Monday–Friday, 08:00–17:00. The clinic will contact you to confirm the appointment.</p>
         </header>
 
         <?php if ($databaseError): ?>
@@ -226,7 +237,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
                     </div>
                     <div class="form-group col-md-6">
                         <label for="requested_time">Preferred time</label>
-                        <input class="form-control" id="requested_time" name="requested_time" type="time" value="<?= bookingEscape($form['requested_time']) ?>" required>
+                        <input class="form-control" id="requested_time" name="requested_time" type="time" min="08:00" max="16:59" value="<?= bookingEscape($form['requested_time']) ?>" required>
+                        <small class="form-text text-muted">The selected service must finish by 17:00.</small>
                     </div>
                 </div>
 
