@@ -4,6 +4,7 @@ declare(strict_types=1);
 session_start();
 
 require_once __DIR__ . '/app/database.php';
+require_once __DIR__ . '/app/mailer.php';
 
 if (empty($_SESSION['booking_csrf_token'])) {
     $_SESSION['booking_csrf_token'] = bin2hex(random_bytes(32));
@@ -18,6 +19,8 @@ $services = [];
 $errors = [];
 $success = false;
 $databaseError = false;
+$emailNotificationAttempted = false;
+$emailNotificationSent = false;
 
 $form = [
     'service_id' => '',
@@ -115,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
     if ($errors === []) {
         try {
             $serviceCheck = $pdo->prepare(
-                'SELECT id, duration_minutes FROM services WHERE id = :id AND is_active = 1'
+                'SELECT id, name, duration_minutes FROM services WHERE id = :id AND is_active = 1'
             );
             $serviceCheck->execute(['id' => $serviceId]);
             $selectedService = $serviceCheck->fetch();
@@ -171,6 +174,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
                     'requested_time' => $form['requested_time'],
                     'message' => $form['message'] !== '' ? $form['message'] : null,
                 ]);
+
+                $emailNotificationAttempted = true;
+                $emailNotificationSent = denticoSendAppointmentEmail([
+                    'patient_name' => $form['patient_name'],
+                    'email' => $form['email'],
+                    'service_name' => (string) $selectedService['name'],
+                    'requested_date' => $form['requested_date'],
+                    'requested_time' => $form['requested_time'],
+                ], 'request_received');
 
                 $success = true;
                 $form = [
@@ -256,6 +268,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
         <?php elseif ($success): ?>
             <div class="alert alert-success" role="status">
                 Your appointment request has been received. This is not yet a confirmed appointment; the clinic will contact you.
+                <?php if ($emailNotificationAttempted && $emailNotificationSent): ?>
+                    A confirmation email has been sent to the address you provided.
+                <?php elseif ($emailNotificationAttempted): ?>
+                    We could not send the confirmation email. Your request is saved; please check the local SMTP configuration.
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 
