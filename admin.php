@@ -207,16 +207,18 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Appointment Requests | Dentico Admin</title>
-    <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
         /* Keep the admin area independent from the site's white-text hero styles. */
-        html, body.admin-body {
+        html {
             min-height: 100%;
-            background: #f3f6fa !important;
+            background: #f3f6fa;
         }
         body.admin-body {
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: #f3f6fa !important;
             color: #212529 !important;
             font-family: Arial, sans-serif !important;
             overflow-x: hidden;
@@ -236,12 +238,15 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
         }
         body.admin-body a { color: #0056b3; }
         body.admin-body a:hover { color: #003d80; }
-        .admin-page {
+        main.admin-page {
+            display: block;
             width: 100%;
-            max-width: 100%;
+            max-width: none;
             min-height: 100vh;
+            margin: 0;
             padding: 3rem 24px;
             background: #f3f6fa;
+            color: #212529;
         }
         .admin-panel {
             padding: 1.5rem;
@@ -264,12 +269,12 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
         body.admin-body .text-muted { color: #5b6570 !important; }
         body.admin-body .alert-success { color: #155724; }
         @media (max-width: 576px) {
-            .admin-page { padding: 1.5rem 12px; }
+            main.admin-page { padding: 1.5rem 12px; }
         }
     </style>
 </head>
 <body class="admin-body">
-<main class="container admin-page">
+<main class="container-fluid admin-page">
     <p><a href="index.php">&larr; Back to Dentico homepage</a></p>
     <header class="mb-4">
         <h1>Dentico Admin</h1>
