@@ -1,5 +1,6 @@
 # Local-only database credentials
 /config/database.php
+/config/admin.php
 
 # Local environment and logs
 .env
