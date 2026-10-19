@@ -195,12 +195,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
-        .booking-page { padding: 4rem 0; min-height: 65vh; }
-        .booking-form { max-width: 760px; padding: 2rem; border: 1px solid #e5e7eb; border-radius: .5rem; background: #fff; }
-        .booking-note { color: #555; font-size: .95rem; }
+        html { min-height: 100%; }
+
+        body.booking-body {
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f3f6fa !important;
+            background-image: url("assets/img/bg_2_blurred.jpg") !important;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        body.booking-body .booking-page {
+            padding: 4rem 0;
+            min-height: 100vh;
+        }
+
+        body.booking-body .booking-form {
+            max-width: 760px;
+            padding: 2rem;
+            border: 1px solid rgba(229, 231, 235, 0.75);
+            border-radius: .5rem;
+            background: rgba(255, 255, 255, 0.60) !important;
+        }
+
+        body.booking-body .booking-form label,
+        body.booking-body .booking-form .form-text,
+        body.booking-body header h1,
+        body.booking-body header p {
+            color: #212529;
+        }
+
+        .booking-note { font-size: .95rem; }
+
+        @media (max-width: 576px) {
+            body.booking-body .booking-form { padding: 1.25rem; }
+            body.booking-body .booking-page { padding: 2rem 15px; }
+        }
     </style>
 </head>
-<body>
+<body class="booking-body">
     <main class="container booking-page">
         <p><a href="index.php">&larr; Back to Dentico homepage</a></p>
         <header class="mb-4">
