@@ -210,15 +210,65 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
-        .admin-page { padding: 3rem 0; }
-        .admin-panel { padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: .5rem; background: #fff; }
-        .request-card { border: 1px solid #e5e7eb; border-radius: .4rem; padding: 1rem; margin-bottom: 1rem; }
-        .request-meta { color: #555; font-size: .9rem; }
+        /* Keep the admin area independent from the site's white-text hero styles. */
+        html, body.admin-body {
+            min-height: 100%;
+            background: #f3f6fa !important;
+        }
+        body.admin-body {
+            min-height: 100vh;
+            color: #212529 !important;
+            font-family: Arial, sans-serif !important;
+            overflow-x: hidden;
+        }
+        body.admin-body h1,
+        body.admin-body h2,
+        body.admin-body h3,
+        body.admin-body h4,
+        body.admin-body h5,
+        body.admin-body h6,
+        body.admin-body p,
+        body.admin-body label,
+        body.admin-body strong,
+        body.admin-body .small,
+        body.admin-body .request-meta {
+            color: #212529;
+        }
+        body.admin-body a { color: #0056b3; }
+        body.admin-body a:hover { color: #003d80; }
+        .admin-page {
+            width: 100%;
+            max-width: 100%;
+            min-height: 100vh;
+            padding: 3rem 24px;
+            background: #f3f6fa;
+        }
+        .admin-panel {
+            padding: 1.5rem;
+            border: 1px solid #d7dee7;
+            border-radius: .5rem;
+            background: #fff;
+            color: #212529;
+        }
+        .request-card {
+            border: 1px solid #d7dee7;
+            border-radius: .4rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #fff;
+            color: #212529;
+        }
+        .request-meta { color: #495057 !important; font-size: .9rem; }
         .admin-login { max-width: 460px; }
         .request-note { white-space: pre-wrap; overflow-wrap: anywhere; }
+        body.admin-body .text-muted { color: #5b6570 !important; }
+        body.admin-body .alert-success { color: #155724; }
+        @media (max-width: 576px) {
+            .admin-page { padding: 1.5rem 12px; }
+        }
     </style>
 </head>
-<body>
+<body class="admin-body">
 <main class="container admin-page">
     <p><a href="index.php">&larr; Back to Dentico homepage</a></p>
     <header class="mb-4">
