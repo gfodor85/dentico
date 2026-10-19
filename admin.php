@@ -61,16 +61,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
         } else {
             try {
                 $pdo = denticoDatabase();
+                $pdo->beginTransaction();
+
+                // Lock requests for this date while checking and changing confirmation status.
+                $dateLock = $pdo->prepare(
+                    'SELECT id FROM appointment_requests WHERE requested_date = (
+                        SELECT requested_date FROM appointment_requests WHERE id = :id
+                    ) FOR UPDATE'
+                );
+                $dateLock->execute(['id' => $requestId]);
+                $dateLock->fetchAll();
+
+                $currentStatement = $pdo->prepare(
+                    'SELECT ar.id, ar.requested_date, ar.requested_time, ar.status,
+                            s.duration_minutes
+                     FROM appointment_requests ar
+                     INNER JOIN services s ON s.id = ar.service_id
+                     WHERE ar.id = :id'
+                );
+                $currentStatement->execute(['id' => $requestId]);
+                $current = $currentStatement->fetch();
+
+                if (!$current) {
+                    throw new RuntimeException('Appointment request not found.');
+                }
+
+                if ($status === 'confirmed') {
+                    $appointmentDate = new DateTimeImmutable($current['requested_date']);
+                    $startMinutes = ((int) substr((string) $current['requested_time'], 0, 2) * 60)
+                        + (int) substr((string) $current['requested_time'], 3, 2);
+                    $endMinutes = $startMinutes + (int) $current['duration_minutes'];
+
+                    if ((int) $appointmentDate->format('N') > 5
+                        || $startMinutes < 8 * 60
+                        || $endMinutes > 17 * 60) {
+                        throw new DomainException(
+                            'This request falls outside the clinic opening hours (Monday–Friday, 08:00–17:00). It cannot be confirmed.'
+                        );
+                    }
+
+                    $confirmedStatement = $pdo->prepare(
+                        'SELECT ar.id, ar.requested_time, s.duration_minutes
+                         FROM appointment_requests ar
+                         INNER JOIN services s ON s.id = ar.service_id
+                         WHERE ar.requested_date = :requested_date
+                           AND ar.status = "confirmed"
+                           AND ar.id <> :request_id
+                         FOR UPDATE'
+                    );
+                    $confirmedStatement->execute([
+                        'requested_date' => $current['requested_date'],
+                        'request_id' => $requestId,
+                    ]);
+
+                    foreach ($confirmedStatement->fetchAll() as $existing) {
+                        $existingStart = ((int) substr((string) $existing['requested_time'], 0, 2) * 60)
+                            + (int) substr((string) $existing['requested_time'], 3, 2);
+                        $existingEnd = $existingStart + (int) $existing['duration_minutes'];
+
+                        if ($startMinutes < $existingEnd && $existingStart < $endMinutes) {
+                            throw new DomainException(
+                                'This time overlaps with another confirmed appointment. Choose another time or cancel the conflicting request first.'
+                            );
+                        }
+                    }
+                }
+
                 $update = $pdo->prepare(
                     'UPDATE appointment_requests SET status = :status WHERE id = :id'
                 );
                 $update->execute(['status' => $status, 'id' => $requestId]);
+                $pdo->commit();
+
                 $_SESSION['admin_flash'] = $update->rowCount() > 0
                     ? 'Appointment request status updated.'
                     : 'No changes were made to that request.';
                 header('Location: admin.php');
                 exit;
+            } catch (DomainException $exception) {
+                if (isset($pdo) && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                $errors[] = $exception->getMessage();
             } catch (Throwable $exception) {
+                if (isset($pdo) && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
                 error_log('Dentico admin update error: ' . $exception->getMessage());
                 $errors[] = 'The status could not be updated. Please try again.';
             }
