@@ -90,10 +90,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
 
     if (!$validDate || $form['requested_date'] < date('Y-m-d')) {
         $errors[] = 'Please select a valid date that is today or in the future.';
+    } elseif ((int) $date->format('N') > 5) {
+        $errors[] = 'Appointment requests are accepted Monday through Friday only.';
     }
 
-    if (!preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $form['requested_time'])) {
+    if (!preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/', $form['requested_time'])) {
         $errors[] = 'Please select a valid time.';
+    } else {
+        $requestedStart = (int) substr($form['requested_time'], 0, 2) * 60
+            + (int) substr($form['requested_time'], 3, 2);
+
+        if ($requestedStart < 8 * 60 || $requestedStart >= 17 * 60) {
+            $errors[] = 'Please choose a start time between 08:00 and 16:59, Monday to Friday.';
+        }
     }
 
     if ($errors === []) {
