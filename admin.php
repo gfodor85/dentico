@@ -4,6 +4,7 @@ declare(strict_types=1);
 session_start();
 
 require_once __DIR__ . '/app/database.php';
+require_once __DIR__ . '/app/mailer.php';
 
 function adminEscape(?string $value): string
 {
@@ -87,8 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
                 $dateLock->fetchAll();
 
                 $currentStatement = $pdo->prepare(
-                    'SELECT ar.id, ar.requested_date, ar.requested_time, ar.status,
-                            s.duration_minutes
+                    'SELECT ar.id, ar.patient_name, ar.email, ar.requested_date, ar.requested_time, ar.status,
+                            s.name AS service_name, s.duration_minutes
                      FROM appointment_requests ar
                      INNER JOIN services s ON s.id = ar.service_id
                      WHERE ar.id = :id'
@@ -147,9 +148,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
                 $update->execute(['status' => $status, 'id' => $requestId]);
                 $pdo->commit();
 
-                $_SESSION['admin_flash'] = $update->rowCount() > 0
+                $flashMessage = $update->rowCount() > 0
                     ? 'Appointment request status updated.'
                     : 'No changes were made to that request.';
+
+                // Send notifications only after the database transaction has committed.
+                // Mail failure must never roll back a successfully saved status change.
+                if ($current['status'] !== $status && in_array($status, ['confirmed', 'cancelled'], true)) {
+                    $emailSent = denticoSendAppointmentEmail([
+                        'patient_name' => (string) $current['patient_name'],
+                        'email' => (string) $current['email'],
+                        'service_name' => (string) $current['service_name'],
+                        'requested_date' => (string) $current['requested_date'],
+                        'requested_time' => (string) $current['requested_time'],
+                    ], $status);
+
+                    $flashMessage .= $emailSent
+                        ? ' Email notification sent.'
+                        : ' The status was saved, but the email notification could not be sent. Check the local SMTP configuration.';
+                }
+
+                $_SESSION['admin_flash'] = $flashMessage;
                 header('Location: admin.php');
                 exit;
             } catch (DomainException $exception) {
