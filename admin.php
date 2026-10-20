@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+date_default_timezone_set('Europe/Budapest');
+ini_set('session.use_strict_mode', '1');
+
 $isHttps = isset($_SERVER['HTTPS'])
     && $_SERVER['HTTPS'] !== ''
     && $_SERVER['HTTPS'] !== 'off';
@@ -14,6 +17,18 @@ session_set_cookie_params([
 ]);
 
 session_start();
+
+// Expire inactive admin sessions after 30 minutes.
+if (!empty($_SESSION['admin_authenticated'])) {
+    $lastActivity = $_SESSION['admin_last_activity'] ?? 0;
+    if (!is_int($lastActivity) || $lastActivity < time() - 1800) {
+        $_SESSION = [];
+        session_regenerate_id(true);
+    } else {
+        $_SESSION['admin_last_activity'] = time();
+    }
+}
+
 require_once __DIR__ . '/app/database.php';
 require_once __DIR__ . '/app/mailer.php';
 
@@ -69,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
         if (password_verify($password, $adminConfig['password_hash'])) {
             session_regenerate_id(true);
             $_SESSION['admin_authenticated'] = true;
+            $_SESSION['admin_last_activity'] = time();
             $_SESSION['admin_csrf_token'] = bin2hex(random_bytes(32));
             header('Location: admin.php');
             exit;
@@ -118,11 +134,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
                         + (int) substr((string) $current['requested_time'], 3, 2);
                     $endMinutes = $startMinutes + (int) $current['duration_minutes'];
 
-                    if ((int) $appointmentDate->format('N') > 5
+                    if ($current['requested_date'] < (new DateTimeImmutable('today'))->format('Y-m-d')
+                        || (int) $appointmentDate->format('N') > 5
                         || $startMinutes < 8 * 60
                         || $endMinutes > 17 * 60) {
                         throw new DomainException(
-                            'This request falls outside the clinic opening hours (Monday–Friday, 08:00–17:00). It cannot be confirmed.'
+                            'This request is in the past or falls outside clinic opening hours (Monday–Friday, 08:00–17:00). It cannot be confirmed.'
                         );
                     }
 

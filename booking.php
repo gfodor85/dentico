@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+date_default_timezone_set('Europe/Budapest');
+ini_set('session.use_strict_mode', '1');
+
 $isHttps = isset($_SERVER['HTTPS'])
     && $_SERVER['HTTPS'] !== ''
     && $_SERVER['HTTPS'] !== 'off';

@@ -73,7 +73,7 @@ try {
             <div class="form-alert-text">
                 <p>Ooops! It seems something went wrong.</p><br>
                 <p>Message could not be sent.</p><br>
-                <p> Mailer Error: '. $mail->ErrorInfo .'</p>
+                <p> Mailer Error: '. htmlspecialchars($mail->ErrorInfo, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') .'</p>
                 <svg class="error_msg">
                     <use xlink:href="../../img/svg/symbols.svg#error_msg"></use>
                 </svg><br><br>
