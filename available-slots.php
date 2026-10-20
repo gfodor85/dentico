@@ -46,9 +46,12 @@ try {
     if (!$service) {
         sendSlotsResponse(['slots' => [], 'message' => 'This service is not currently available.'], 404);
     }
+    if ((int) $service['duration_minutes'] < 1) {
+        sendSlotsResponse(['slots' => [], 'message' => 'This service is temporarily unavailable.'], 422);
+    }
 
     $appointmentsStatement = $pdo->prepare(
-        'SELECT ar.requested_time, s.duration_minutes
+        'SELECT ar.requested_time, ar.duration_minutes
          FROM appointment_requests ar
          INNER JOIN services s ON s.id = ar.service_id
          WHERE ar.requested_date = :requested_date

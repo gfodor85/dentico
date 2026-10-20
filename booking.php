@@ -18,6 +18,7 @@ session_set_cookie_params([
 
 session_start();
 require_once __DIR__ . '/app/database.php';
+require_once __DIR__ . '/app/rate_limit.php';
 require_once __DIR__ . '/app/mailer.php';
 
 if (empty($_SESSION['booking_csrf_token'])) {
@@ -73,6 +74,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
 
     if (!hash_equals($_SESSION['booking_csrf_token'], $postedToken)) {
         $errors[] = 'The form expired or could not be verified. Please reload the page and try again.';
+    } else {
+        try {
+            if (!denticoRateLimitConsume(
+                $pdo,
+                'booking',
+                (string) ($_SERVER['REMOTE_ADDR'] ?? ''),
+                5,
+                900
+            )) {
+                $errors[] = 'Too many requests were sent from this connection. Please wait and try again.';
+            }
+        } catch (Throwable $exception) {
+            error_log('Dentico booking rate-limit error: ' . $exception->getMessage());
+            $errors[] = 'The booking form is temporarily unavailable. Please try again later.';
+        }
     }
 
     if ($form['patient_name'] === '' || mb_strlen($form['patient_name']) > 120) {
@@ -139,6 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
 
             if (!$selectedService) {
                 $errors[] = 'That service is no longer available. Please select another service.';
+            } elseif ((int) $selectedService['duration_minutes'] < 1) {
+                $errors[] = 'That service is temporarily unavailable. Please contact the clinic.';
             } else {
                 $startMinutes = (int) substr($form['requested_time'], 0, 2) * 60
                     + (int) substr($form['requested_time'], 3, 2);
@@ -150,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
                     // Recheck availability on submission in case another appointment was confirmed
                     // after the visitor loaded the available-times list.
                     $busyStatement = $pdo->prepare(
-                        'SELECT ar.requested_time, s.duration_minutes
+                        'SELECT ar.requested_time, ar.duration_minutes
                          FROM appointment_requests ar
                          INNER JOIN services s ON s.id = ar.service_id
                          WHERE ar.requested_date = :requested_date
@@ -174,13 +192,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
             if ($errors === []) {
                 $insert = $pdo->prepare(
                     'INSERT INTO appointment_requests
-                        (service_id, patient_name, email, phone, requested_date, requested_time, message)
+                        (service_id, duration_minutes, patient_name, email, phone, requested_date, requested_time, message)
                      VALUES
-                        (:service_id, :patient_name, :email, :phone, :requested_date, :requested_time, :message)'
+                        (:service_id, :duration_minutes, :patient_name, :email, :phone, :requested_date, :requested_time, :message)'
                 );
 
                 $insert->execute([
                     'service_id' => $serviceId,
+                    'duration_minutes' => (int) $selectedService['duration_minutes'],
                     'patient_name' => $form['patient_name'],
                     'email' => $form['email'],
                     'phone' => $form['phone'],

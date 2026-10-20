@@ -58,13 +58,26 @@ Az audit térjen ki a következőkre:
 
 Az eredményben minden lényeges megállapításhoz adj súlyosságot, pontos fájl-/kódhelyet, rövid indoklást, konkrét javítási javaslatot és teszttervet. Ne nevezz feltételezett problémát igazolt sérülékenységnek bizonyíték nélkül.
 
-## 7. Ajánlott következő szakaszok
+## 7. Biztonsági javítási kör (nyitott PR #5)
+
+A `feature/codex-security-hardening` ág a `feature/codex-handoff` ágra készített, még be nem olvasztott javításokat tartalmaz:
+
+- Admin inaktivitási lejárat (30 perc), PHP strict session mód és egységes `Europe/Budapest` időzóna.
+- Öt adminbelépési, foglalási vagy kontaktűrlap-kérés engedélyezett kliens-IP-címenként 15 perc alatt; CSRF-ellenőrzés a kontaktűrlapon.
+- Közös root Composer PHPMailer használata a kontaktűrlapon, szerveroldali bemenetellenőrzés és HTML-escaping; mailerhiba nem fordítja vissza a már elmentett foglalást vagy státuszt.
+- Adminjóváhagyások dátumonkénti InnoDB-zárolása, tiltott státuszátmenetek és múltbeli foglalás jóváhagyásának elutasítása.
+- A foglaláskori szolgáltatáshossz rögzítése, valamint adminlista lapozása és külön heti naptárlekérdezés.
+- Meglévő adatbázisnál egyszer alkalmazandó: `database/migrations/20261020_security_hardening.sql`. Új adatbázisnál a frissített `database/schema.sql` használható. Az alkalmazás nem futtat automatikus migrációt.
+
+A módosított PHP-fájlok PHP 8.2.12 lintje sikeres. MySQL-konkurenciateszt, böngészős CSRF/XSS-próba és SMTP-integráció nincs igazolva; ezeket XAMPP-ban kell elvégezni a migráció alkalmazása után.
+
+## 8. Ajánlott következő szakaszok
 
 - Audit-jelentés közös áttekintése és prioritások kijelölése.
 - Külön feature branchekben, kis PR-eken keresztül a valódi hibák javítása.
 - PHP-lint, célzott automatikus tesztek és XAMPP/MySQL integrációs ellenőrzések bevezetése.
 - Később fokozatos UX-, admin- és foglalási fejlesztések; a már működő PHP-rendszer megtartásával.
 
-## 8. Fejlesztési szabály
+## 9. Fejlesztési szabály
 
 A repo gyökerében található `AGENTS.md` tartalmazza a Codex számára szóló általános projektutasításokat. Változtatás, adatbázis-migráció, külső levélküldés, éles telepítés vagy merge előtt a tulajdonos jóváhagyása szükséges.

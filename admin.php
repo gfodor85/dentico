@@ -30,6 +30,7 @@ if (!empty($_SESSION['admin_authenticated'])) {
 }
 
 require_once __DIR__ . '/app/database.php';
+require_once __DIR__ . '/app/rate_limit.php';
 require_once __DIR__ . '/app/mailer.php';
 
 function adminEscape(?string $value): string
@@ -53,6 +54,9 @@ $errors = [];
 $flash = $_SESSION['admin_flash'] ?? '';
 unset($_SESSION['admin_flash']);
 $requests = [];
+$totalRequests = 0;
+$requestPage = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ?: 1;
+$pageSize = 25;
 $databaseError = false;
 
 // The calendar defaults to the current week; ?week=YYYY-MM-DD selects another week.
@@ -81,17 +85,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
             ? $_POST['password']
             : '';
 
-        if (password_verify($password, $adminConfig['password_hash'])) {
-            session_regenerate_id(true);
-            $_SESSION['admin_authenticated'] = true;
-            $_SESSION['admin_last_activity'] = time();
-            $_SESSION['admin_csrf_token'] = bin2hex(random_bytes(32));
-            header('Location: admin.php');
-            exit;
-        }
+        try {
+            $pdo = denticoDatabase();
+            $clientAddress = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+            $canAttemptLogin = denticoRateLimitConsume($pdo, 'admin_login', $clientAddress, 5, 900);
 
-        // Avoid revealing whether a particular password was close to correct.
-        $errors[] = 'The password was incorrect.';
+            if ($canAttemptLogin && password_verify($password, $adminConfig['password_hash'])) {
+                denticoRateLimitClear($pdo, 'admin_login', $clientAddress);
+                session_regenerate_id(true);
+                $_SESSION['admin_authenticated'] = true;
+                $_SESSION['admin_last_activity'] = time();
+                $_SESSION['admin_csrf_token'] = bin2hex(random_bytes(32));
+                header('Location: admin.php');
+                exit;
+            }
+
+            // Keep the response identical for invalid passwords and throttled attempts.
+            $errors[] = 'The password was incorrect, or too many attempts were made. Please try again later.';
+        } catch (Throwable $exception) {
+            error_log('Dentico admin login error: ' . $exception->getMessage());
+            $errors[] = 'Sign-in is temporarily unavailable. Please try again later.';
+        }
     } elseif (!empty($_SESSION['admin_authenticated']) && isset($_POST['request_id'], $_POST['status'])) {
         $requestId = filter_var($_POST['request_id'], FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1],
@@ -105,18 +119,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
                 $pdo = denticoDatabase();
                 $pdo->beginTransaction();
 
-                // Lock requests for this date while checking and changing confirmation status.
+                // Serialize confirmation changes per appointment date, including dates with no rows to lock.
                 $dateLock = $pdo->prepare(
-                    'SELECT id FROM appointment_requests WHERE requested_date = (
-                        SELECT requested_date FROM appointment_requests WHERE id = :id
-                    ) FOR UPDATE'
+                    'SELECT requested_date FROM appointment_requests WHERE id = :id'
                 );
                 $dateLock->execute(['id' => $requestId]);
-                $dateLock->fetchAll();
+                $requestedDateForLock = $dateLock->fetchColumn();
+                if ($requestedDateForLock === false) {
+                    throw new RuntimeException('Appointment request not found.');
+                }
+
+                $ensureDayLock = $pdo->prepare(
+                    'INSERT IGNORE INTO appointment_day_locks (appointment_date) VALUES (:requested_date)'
+                );
+                $ensureDayLock->execute(['requested_date' => $requestedDateForLock]);
+
+                $dayLock = $pdo->prepare(
+                    'SELECT appointment_date FROM appointment_day_locks
+                     WHERE appointment_date = :requested_date FOR UPDATE'
+                );
+                $dayLock->execute(['requested_date' => $requestedDateForLock]);
+                $dayLock->fetchColumn();
 
                 $currentStatement = $pdo->prepare(
                     'SELECT ar.id, ar.patient_name, ar.email, ar.requested_date, ar.requested_time, ar.status,
-                            s.name AS service_name, s.duration_minutes
+                            s.name AS service_name, ar.duration_minutes
                      FROM appointment_requests ar
                      INNER JOIN services s ON s.id = ar.service_id
                      WHERE ar.id = :id'
@@ -128,13 +155,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
                     throw new RuntimeException('Appointment request not found.');
                 }
 
+                $allowedTransitions = [
+                    'pending' => ['confirmed', 'cancelled'],
+                    'confirmed' => ['cancelled'],
+                    'cancelled' => [],
+                ];
+                if ($current['status'] !== $status
+                    && !in_array($status, $allowedTransitions[$current['status']] ?? [], true)) {
+                    throw new DomainException('That status change is not allowed.');
+                }
+
                 if ($status === 'confirmed') {
                     $appointmentDate = new DateTimeImmutable($current['requested_date']);
                     $startMinutes = ((int) substr((string) $current['requested_time'], 0, 2) * 60)
                         + (int) substr((string) $current['requested_time'], 3, 2);
                     $endMinutes = $startMinutes + (int) $current['duration_minutes'];
 
-                    if ($current['requested_date'] < (new DateTimeImmutable('today'))->format('Y-m-d')
+                    if ((int) $current['duration_minutes'] < 1
+                        || $current['requested_date'] < (new DateTimeImmutable('today'))->format('Y-m-d')
                         || (int) $appointmentDate->format('N') > 5
                         || $startMinutes < 8 * 60
                         || $endMinutes > 17 * 60) {
@@ -144,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
                     }
 
                     $confirmedStatement = $pdo->prepare(
-                        'SELECT ar.id, ar.requested_time, s.duration_minutes
+                        'SELECT ar.id, ar.requested_time, ar.duration_minutes
                          FROM appointment_requests ar
                          INNER JOIN services s ON s.id = ar.service_id
                          WHERE ar.requested_date = :requested_date
@@ -241,24 +279,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
 if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
     try {
         $pdo = denticoDatabase();
-        $statement = $pdo->query(
+        $totalRequests = (int) $pdo->query('SELECT COUNT(*) FROM appointment_requests')->fetchColumn();
+        $lastPage = max(1, (int) ceil($totalRequests / $pageSize));
+        $requestPage = min($requestPage, $lastPage);
+        $statement = $pdo->prepare(
             'SELECT ar.id, ar.patient_name, ar.email, ar.phone, ar.requested_date,
                     ar.requested_time, ar.message, ar.status, ar.created_at,
-                    s.name AS service_name, s.duration_minutes
+                    s.name AS service_name, ar.duration_minutes
              FROM appointment_requests ar
              INNER JOIN services s ON s.id = ar.service_id
              ORDER BY
                 CASE ar.status WHEN "pending" THEN 0 WHEN "confirmed" THEN 1 ELSE 2 END,
-                ar.requested_date ASC, ar.requested_time ASC, ar.id DESC'
+                ar.requested_date ASC, ar.requested_time ASC, ar.id DESC
+             LIMIT :page_size OFFSET :page_offset'
         );
+        $statement->bindValue('page_size', $pageSize, PDO::PARAM_INT);
+        $statement->bindValue('page_offset', ($requestPage - 1) * $pageSize, PDO::PARAM_INT);
+        $statement->execute();
         $requests = $statement->fetchAll();
 
-        foreach ($requests as $request) {
-            if ($request['status'] === 'confirmed'
-                && $request['requested_date'] >= $weekStart->format('Y-m-d')
-                && $request['requested_date'] <= $weekEnd->format('Y-m-d')) {
-                $confirmedByDate[$request['requested_date']][] = $request;
-            }
+        $calendarStatement = $pdo->prepare(
+            'SELECT ar.id, ar.patient_name, ar.requested_date, ar.requested_time,
+                    s.name AS service_name, ar.duration_minutes
+             FROM appointment_requests ar
+             INNER JOIN services s ON s.id = ar.service_id
+             WHERE ar.status = "confirmed"
+               AND ar.requested_date BETWEEN :week_start AND :week_end
+             ORDER BY ar.requested_date, ar.requested_time'
+        );
+        $calendarStatement->execute([
+            'week_start' => $weekStart->format('Y-m-d'),
+            'week_end' => $weekEnd->format('Y-m-d'),
+        ]);
+        foreach ($calendarStatement->fetchAll() as $calendarRequest) {
+            $confirmedByDate[$calendarRequest['requested_date']][] = $calendarRequest;
         }
     } catch (Throwable $exception) {
         error_log('Dentico admin list error: ' . $exception->getMessage());
@@ -386,7 +440,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
             </section>
         <?php else: ?>
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <p class="mb-0">Requests: <strong><?= count($requests) ?></strong></p>
+                <p class="mb-0">Requests: <strong><?= $totalRequests ?></strong></p>
                 <form method="post" action="admin.php">
                     <input type="hidden" name="csrf_token" value="<?= adminEscape($_SESSION['admin_csrf_token']) ?>">
                     <button class="btn btn-outline-secondary btn-sm" type="submit" name="logout" value="1">Sign out</button>
@@ -437,6 +491,13 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                 <div class="alert alert-info" role="status">There are no appointment requests yet.</div>
             <?php else: ?>
                 <?php foreach ($requests as $request): ?>
+                    <?php
+                    $statusOptions = match ($request['status']) {
+                        'pending' => ['pending', 'confirmed', 'cancelled'],
+                        'confirmed' => ['confirmed', 'cancelled'],
+                        default => ['cancelled'],
+                    };
+                    ?>
                     <article class="request-card" id="request-<?= (int) $request['id'] ?>">
                         <div class="d-flex flex-wrap justify-content-between align-items-start">
                             <h2 class="h5">Request #<?= (int) $request['id'] ?> — <?= adminEscape($request['patient_name']) ?></h2>
@@ -459,14 +520,28 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                             <input type="hidden" name="request_id" value="<?= (int) $request['id'] ?>">
                             <label class="mr-2" for="status-<?= (int) $request['id'] ?>">Update status</label>
                             <select class="form-control form-control-sm mr-2 mb-2" id="status-<?= (int) $request['id'] ?>" name="status">
-                                <option value="pending" <?= $request['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                <option value="confirmed" <?= $request['status'] === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
-                                <option value="cancelled" <?= $request['status'] === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                                <?php foreach ($statusOptions as $statusOption): ?>
+                                    <option value="<?= adminEscape($statusOption) ?>" selected><?= adminEscape(ucfirst($statusOption)) ?></option>
+                                <?php endforeach; ?>
                             </select>
                             <button class="btn btn-primary btn-sm mb-2" type="submit">Save status</button>
                         </form>
                     </article>
                 <?php endforeach; ?>
+                <?php
+                $lastPage = max(1, (int) ceil($totalRequests / $pageSize));
+                if ($lastPage > 1):
+                ?>
+                    <nav class="mt-3" aria-label="Request pages">
+                        <li class="page-item <?= $requestPage <= 1 ? 'disabled' : '' ?>">
+                            <a class="page-link" href="admin.php?page=<?= max(1, $requestPage - 1) ?>&amp;week=<?= adminEscape($weekStart->format('Y-m-d')) ?>">Previous</a>
+                        </li>
+                        <li class="page-item disabled"><span class="page-link">Page <?= $requestPage ?> of <?= $lastPage ?></span></li>
+                        <li class="page-item <?= $requestPage >= $lastPage ? 'disabled' : '' ?>">
+                            <a class="page-link" href="admin.php?page=<?= min($lastPage, $requestPage + 1) ?>&amp;week=<?= adminEscape($weekStart->format('Y-m-d')) ?>">Next</a>
+                        </li>
+                    </nav>
+                <?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>
     <?php endif; ?>

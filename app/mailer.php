@@ -9,6 +9,16 @@ declare(strict_types=1);
  */
 function denticoSendAppointmentEmail(array $appointment, string $event): bool
 {
+    try {
+        return denticoSendAppointmentEmailInternal($appointment, $event);
+    } catch (Throwable $exception) {
+        error_log('Dentico mail notification failed: ' . get_class($exception));
+        return false;
+    }
+}
+
+function denticoSendAppointmentEmailInternal(array $appointment, string $event): bool
+{
     if (!in_array($event, ['request_received', 'confirmed', 'cancelled'], true)) {
         error_log('Dentico mail: unsupported notification event.');
         return false;

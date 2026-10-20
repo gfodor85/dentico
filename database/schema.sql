@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS services (
 CREATE TABLE IF NOT EXISTS appointment_requests (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     service_id INT UNSIGNED NOT NULL,
+    duration_minutes SMALLINT UNSIGNED NOT NULL,
     patient_name VARCHAR(120) NOT NULL,
     email VARCHAR(254) NOT NULL,
     phone VARCHAR(40) NOT NULL,
@@ -54,3 +55,17 @@ SELECT 'Cosmetic dentistry consultation', 'Example service; update this text for
 WHERE NOT EXISTS (
     SELECT 1 FROM services WHERE name = 'Cosmetic dentistry consultation'
 );
+
+CREATE TABLE IF NOT EXISTS appointment_day_locks (
+    appointment_date DATE NOT NULL,
+    PRIMARY KEY (appointment_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS request_rate_limits (
+    scope VARCHAR(32) NOT NULL,
+    client_hash CHAR(64) NOT NULL,
+    window_start BIGINT UNSIGNED NOT NULL,
+    attempt_count INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (scope, client_hash),
+    KEY idx_request_rate_limits_window (window_start)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

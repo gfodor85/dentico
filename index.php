@@ -1,3 +1,21 @@
+<?php
+declare(strict_types=1);
+
+date_default_timezone_set('Europe/Budapest');
+ini_set('session.use_strict_mode', '1');
+$isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off';
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => $isHttps,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+session_start();
+if (empty($_SESSION['contact_csrf_token'])) {
+    $_SESSION['contact_csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
 <!doctype html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->

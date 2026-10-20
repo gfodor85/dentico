@@ -7,6 +7,7 @@
     <div class="col-md-6 col-md-offset-3">
 
         <form id="contact-form" method="post" action="assets/php/contact-form/handler.php">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['contact_csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
 
             <div class="from-group">
                 <input class="form-control" type="text" name="name" placeholder="Please add your name" required>
