@@ -312,8 +312,12 @@
 <!-- Google Maps API -->
 <script src='assets/js/map.js'></script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCWzk0M2zSGISzTxuP0Wv6TQ99Ab_0PIBM&callback=initMap"
-  type="text/javascript"></script>
+<?php
+$googleMapsApiKey = getenv('GOOGLE_MAPS_API_KEY');
+if ($googleMapsApiKey !== false && $googleMapsApiKey !== ''):
+?>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($googleMapsApiKey) ?>&amp;callback=initMap" type="text/javascript"></script>
+<?php endif; ?>
 
 
 <!-- Modal -->
