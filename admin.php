@@ -56,6 +56,9 @@ unset($_SESSION['admin_flash']);
 $requests = [];
 $totalRequests = 0;
 $requestPage = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ?: 1;
+$focusedRequestId = filter_var($_GET['focus'] ?? null, FILTER_VALIDATE_INT, [
+    'options' => ['min_range' => 1],
+]) ?: null;
 $pageSize = 25;
 $databaseError = false;
 
@@ -165,15 +168,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $hasPasswordHash) {
                     throw new DomainException('That status change is not allowed.');
                 }
 
-                if ($status === 'confirmed') {
-                    $appointmentDate = new DateTimeImmutable($current['requested_date']);
+                if ($status === 'confirmed' && $current['status'] !== 'confirmed') {
+                    // Compare date AND time in the clinic's Europe/Budapest timezone.
+                    $appointmentStart = new DateTimeImmutable(
+                        (string) $current['requested_date'] . ' ' . (string) $current['requested_time']
+                    );
                     $startMinutes = ((int) substr((string) $current['requested_time'], 0, 2) * 60)
                         + (int) substr((string) $current['requested_time'], 3, 2);
                     $endMinutes = $startMinutes + (int) $current['duration_minutes'];
 
                     if ((int) $current['duration_minutes'] < 1
-                        || $current['requested_date'] < (new DateTimeImmutable('today'))->format('Y-m-d')
-                        || (int) $appointmentDate->format('N') > 5
+                        || $appointmentStart <= new DateTimeImmutable('now')
+                        || (int) $appointmentStart->format('N') > 5
                         || $startMinutes < 8 * 60
                         || $endMinutes > 17 * 60) {
                         throw new DomainException(
@@ -297,6 +303,24 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
         $statement->bindValue('page_offset', ($requestPage - 1) * $pageSize, PDO::PARAM_INT);
         $statement->execute();
         $requests = $statement->fetchAll();
+
+        // Keep calendar deep links functional even if their request is on another list page.
+        if ($focusedRequestId !== null
+            && !in_array($focusedRequestId, array_map('intval', array_column($requests, 'id')), true)) {
+            $focusedStatement = $pdo->prepare(
+                'SELECT ar.id, ar.patient_name, ar.email, ar.phone, ar.requested_date,
+                        ar.requested_time, ar.message, ar.status, ar.created_at,
+                        s.name AS service_name, ar.duration_minutes
+                 FROM appointment_requests ar
+                 INNER JOIN services s ON s.id = ar.service_id
+                 WHERE ar.id = :id'
+            );
+            $focusedStatement->execute(['id' => $focusedRequestId]);
+            $focusedRequest = $focusedStatement->fetch();
+            if ($focusedRequest !== false) {
+                array_unshift($requests, $focusedRequest);
+            }
+        }
 
         $calendarStatement = $pdo->prepare(
             'SELECT ar.id, ar.patient_name, ar.requested_date, ar.requested_time,
@@ -447,6 +471,10 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                 </form>
             </div>
 
+            <?php if ($focusedRequestId !== null): ?>
+                <p><a href="admin.php?week=<?= adminEscape($weekStart->format('Y-m-d')) ?>">&larr; Back to requests list</a></p>
+            <?php endif; ?>
+
             <section class="admin-panel mb-4" aria-labelledby="weekly-calendar-heading">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
                     <div>
@@ -475,7 +503,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                                             <strong><?= substr((string) $calendarRequest['requested_time'], 0, 5) ?></strong>
                                             <div class="small"><?= adminEscape($calendarRequest['patient_name']) ?></div>
                                             <div class="small"><?= adminEscape($calendarRequest['service_name']) ?> · <?= (int) $calendarRequest['duration_minutes'] ?> min</div>
-                                            <a class="small" href="#request-<?= (int) $calendarRequest['id'] ?>">View request</a>
+                                            <a class="small" href="admin.php?focus=<?= (int) $calendarRequest['id'] ?>&amp;week=<?= adminEscape($weekStart->format('Y-m-d')) ?>#request-<?= (int) $calendarRequest['id'] ?>">View request</a>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
@@ -521,7 +549,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                             <label class="mr-2" for="status-<?= (int) $request['id'] ?>">Update status</label>
                             <select class="form-control form-control-sm mr-2 mb-2" id="status-<?= (int) $request['id'] ?>" name="status">
                                 <?php foreach ($statusOptions as $statusOption): ?>
-                                    <option value="<?= adminEscape($statusOption) ?>" selected><?= adminEscape(ucfirst($statusOption)) ?></option>
+                                    <option value="<?= adminEscape($statusOption) ?>" <?= $request['status'] === $statusOption ? 'selected' : '' ?>><?= adminEscape(ucfirst($statusOption)) ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <button class="btn btn-primary btn-sm mb-2" type="submit">Save status</button>
