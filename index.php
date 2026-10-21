@@ -330,8 +330,22 @@ if (empty($_SESSION['contact_csrf_token'])) {
 <!-- Google Maps API -->
 <script src='assets/js/map.js'></script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCWzk0M2zSGISzTxuP0Wv6TQ99Ab_0PIBM&callback=initMap"
+<?php
+// Google Maps JavaScript keys are visible in the browser: restrict the key
+// by HTTP referrer and API in Google Cloud, even when configured locally.
+$mapsApiKey = '';
+$mapsConfigPath = __DIR__ . '/config/maps.php';
+if (is_file($mapsConfigPath)) {
+    $mapsConfig = require $mapsConfigPath;
+    if (is_array($mapsConfig) && is_string($mapsConfig['api_key'] ?? null)) {
+        $mapsApiKey = trim($mapsConfig['api_key']);
+    }
+}
+?>
+<?php if ($mapsApiKey !== ''): ?>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<?= htmlspecialchars($mapsApiKey, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>&amp;callback=initMap"
   type="text/javascript"></script>
+<?php endif; ?>
 
 
 <!-- Modal -->
