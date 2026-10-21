@@ -22,6 +22,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST'
     http_response_code(400);
     exit('The form expired or could not be verified. Reload the page and try again.');
 }
+
+// Validate the request before loading mail configuration or emitting HTML.
+if (!isset($_POST['send'])) {
+    http_response_code(400);
+    exit('The contact form submission is incomplete.');
+}
+
+$name = isset($_POST['name']) && is_string($_POST['name']) ? trim($_POST['name']) : '';
+$subject = isset($_POST['subject']) && is_string($_POST['subject']) ? trim($_POST['subject']) : '';
+$email = isset($_POST['email']) && is_string($_POST['email']) ? trim($_POST['email']) : '';
+$message = isset($_POST['message']) && is_string($_POST['message']) ? trim($_POST['message']) : '';
+
+if ($name === '' || mb_strlen($name) > 120
+    || $subject === '' || mb_strlen($subject) > 200
+    || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 254
+    || $message === '' || mb_strlen($message) > 5000) {
+    http_response_code(400);
+    echo '<div class="form-alert-body"><div class="form-alert-text"><p>Please provide valid contact details and a message.</p></div></div>';
+    exit;
+}
 ?>
 <!-- HANDLING -->
 <script type="text/javascript">
@@ -67,20 +87,6 @@ try {
 
     if(isset($_POST['send'])){
             
-        $name = isset($_POST['name']) && is_string($_POST['name']) ? trim($_POST['name']) : '';
-        $subject = isset($_POST['subject']) && is_string($_POST['subject']) ? trim($_POST['subject']) : '';
-        $email = isset($_POST['email']) && is_string($_POST['email']) ? trim($_POST['email']) : '';
-        $message = isset($_POST['message']) && is_string($_POST['message']) ? trim($_POST['message']) : '';
-
-        if ($name === '' || mb_strlen($name) > 120
-            || $subject === '' || mb_strlen($subject) > 200
-            || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 254
-            || $message === '' || mb_strlen($message) > 5000) {
-            http_response_code(400);
-            echo '<div class="form-alert-body"><div class="form-alert-text"><p>Please provide valid contact details and a message.</p></div></div>';
-            exit;
-        }
-
         $pdo = denticoDatabase();
         if (!denticoRateLimitConsume($pdo, 'contact', (string) ($_SERVER['REMOTE_ADDR'] ?? ''), 5, 900)) {
             http_response_code(429);
