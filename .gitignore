@@ -1,0 +1,16 @@
+# Local-only database credentials
+/config/database.php
+/config/admin.php
+
+# Local environment and logs
+.env
+.env.*
+!.env.example
+*.log
+
+# Local-only SMTP credentials
+/config/mail.php
+/vendor/
+
+# Local-only Google Maps browser API key (must be HTTP-referrer/API-restricted)
+/config/maps.php

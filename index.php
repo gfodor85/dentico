@@ -1,3 +1,21 @@
+<?php
+declare(strict_types=1);
+
+date_default_timezone_set('Europe/Budapest');
+ini_set('session.use_strict_mode', '1');
+$isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off';
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => $isHttps,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+session_start();
+if (empty($_SESSION['contact_csrf_token'])) {
+    $_SESSION['contact_csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
 <!doctype html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
@@ -313,10 +331,23 @@
 <script src='assets/js/map.js'></script>
 
 <?php
-$googleMapsApiKey = getenv('GOOGLE_MAPS_API_KEY');
-if ($googleMapsApiKey !== false && $googleMapsApiKey !== ''):
+// Google Maps JavaScript keys are visible in the browser: restrict the key
+// by HTTP referrer and API in Google Cloud, even when configured locally.
+$mapsApiKey = trim((string) (getenv('GOOGLE_MAPS_API_KEY') ?: ''));
+$mapsConfigPath = __DIR__ . '/config/maps.php';
+if (is_file($mapsConfigPath)) {
+    $mapsConfig = require $mapsConfigPath;
+    if (is_array($mapsConfig) && is_string($mapsConfig['api_key'] ?? null)) {
+        $localMapsKey = trim($mapsConfig['api_key']);
+        if ($localMapsKey !== '') {
+            $mapsApiKey = $localMapsKey;
+        }
+    }
+}
 ?>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($googleMapsApiKey) ?>&amp;callback=initMap" type="text/javascript"></script>
+<?php if ($mapsApiKey !== ''): ?>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<?= htmlspecialchars($mapsApiKey, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>&amp;callback=initMap"
+  type="text/javascript"></script>
 <?php endif; ?>
 
 
