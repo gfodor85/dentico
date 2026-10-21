@@ -25,6 +25,7 @@ function denticoRateLimitConsume(PDO $pdo, string $scope, string $clientAddress,
     $statement->execute([
         'scope' => $scope,
         'client_hash' => $clientHash,
+        'window_start' => $windowStart,
         'previous_window' => $windowStart,
         'current_window' => $windowStart,
     ]);
