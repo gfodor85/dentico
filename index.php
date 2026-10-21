@@ -333,12 +333,15 @@ if (empty($_SESSION['contact_csrf_token'])) {
 <?php
 // Google Maps JavaScript keys are visible in the browser: restrict the key
 // by HTTP referrer and API in Google Cloud, even when configured locally.
-$mapsApiKey = '';
+$mapsApiKey = trim((string) (getenv('GOOGLE_MAPS_API_KEY') ?: ''));
 $mapsConfigPath = __DIR__ . '/config/maps.php';
 if (is_file($mapsConfigPath)) {
     $mapsConfig = require $mapsConfigPath;
     if (is_array($mapsConfig) && is_string($mapsConfig['api_key'] ?? null)) {
-        $mapsApiKey = trim($mapsConfig['api_key']);
+        $localMapsKey = trim($mapsConfig['api_key']);
+        if ($localMapsKey !== '') {
+            $mapsApiKey = $localMapsKey;
+        }
     }
 }
 ?>

@@ -43,3 +43,25 @@ For an existing local database, import `database/migrations/20261020_security_ha
 ## Current scope
 
 The existing website and contact form are retained. The PDO connection and initial booking schema provide the foundation for adding appointment booking and an administrative interface.
+
+## Google Maps configuration
+
+The Google Maps JavaScript API is optional.
+
+Configure a restricted browser key using either:
+- An untracked config/maps.php file, copied from config/maps.example.php.
+- The GOOGLE_MAPS_API_KEY Apache environment variable.
+
+For Apache/XAMPP, the environment variable can be configured with:
+
+    SetEnv GOOGLE_MAPS_API_KEY "your-restricted-key"
+
+Restart Apache after updating its configuration.
+
+A non-empty key in config/maps.php takes precedence over the
+environment variable. Without a configured key, the map script
+is not loaded.
+
+Restrict the key in Google Cloud to the Maps JavaScript API
+and approved HTTP referrers. Revoke previously exposed keys.
+Do not commit credentials or API keys.
