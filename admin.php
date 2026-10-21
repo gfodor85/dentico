@@ -18,12 +18,19 @@ session_set_cookie_params([
 
 session_start();
 
+// Do not allow authenticated admin pages to be served from browser caches.
+header('Cache-Control: no-store, private, max-age=0');
+header('Pragma: no-cache');
+
+$adminSessionExpired = false;
+
 // Expire inactive admin sessions after 30 minutes.
 if (!empty($_SESSION['admin_authenticated'])) {
     $lastActivity = $_SESSION['admin_last_activity'] ?? 0;
-    if (!is_int($lastActivity) || $lastActivity < time() - 1800) {
+    if (!is_int($lastActivity) || $lastActivity <= time() - 1800) {
         $_SESSION = [];
         session_regenerate_id(true);
+        $adminSessionExpired = true;
     } else {
         $_SESSION['admin_last_activity'] = time();
     }
@@ -51,6 +58,9 @@ if (empty($_SESSION['admin_csrf_token'])) {
 }
 
 $errors = [];
+if ($adminSessionExpired) {
+    $errors[] = 'Your admin session expired after 30 minutes of inactivity. Please sign in again.';
+}
 $flash = $_SESSION['admin_flash'] ?? '';
 unset($_SESSION['admin_flash']);
 $requests = [];
