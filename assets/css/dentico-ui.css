@@ -488,3 +488,49 @@ body.dentico-booking .booking-form,
     background-attachment: fixed;
   }
 }
+/* Explore Care: let the artwork occupy approximately half of each card. */
+.dentico-home #treatments .dc-feature {
+  display: grid;
+  grid-template-rows: minmax(230px, 1fr) minmax(230px, 1fr);
+  min-height: 460px;
+  padding: 0;
+  overflow: hidden;
+}
+.dentico-home #treatments .dc-feature__media {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 15px;
+  background: linear-gradient(145deg, rgba(218, 250, 245, .94), rgba(166, 228, 221, .56));
+}
+.dentico-home #treatments .dc-feature__art {
+  display: block;
+  width: min(92%, 275px);
+  height: 208px;
+  max-width: 100%;
+  object-fit: contain;
+  margin: 0;
+  filter: drop-shadow(0 10px 12px rgba(0, 91, 86, .13));
+}
+.dentico-home #treatments .dc-feature__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px 25px 28px;
+}
+.dentico-home #treatments .dc-feature__body h3 { margin-bottom: 12px; }
+.dentico-home #treatments .dc-feature__body p {
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 16px;
+}
+.dentico-home #treatments .dc-feature__body .dc-inline-link {
+  margin-top: auto;
+}
+@media (max-width: 600px) {
+  .dentico-home #treatments .dc-feature {
+    grid-template-rows: 210px minmax(200px,auto);
+    min-height: 410px;
+  }
+  .dentico-home #treatments .dc-feature__art { height: 185px; }
+}
