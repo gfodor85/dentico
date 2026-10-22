@@ -1,0 +1,536 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
+/* Dentico UI 2026 — presentation only. Scoped to the redesigned pages. */
+:root {
+  --dc-ink: #163b42;
+  --dc-muted: #546c71;
+  --dc-blue: #009e98;
+  --dc-blue-dark: #007b76;
+  --dc-teal: #00bbae;
+  --dc-line: #d3e7e6;
+  --dc-bg: #eef6f5;
+  --dc-card: #ffffff;
+  --dc-shadow: 0 18px 50px rgba(17, 55, 85, .09);
+  --dc-radius: 22px;
+}
+html { scroll-behavior: smooth; }
+body.dentico-home, body.dentico-booking, body.dentico-services, body.dentico-admin {
+  margin: 0; min-height: 100vh; background: var(--dc-bg) !important;
+  color: var(--dc-ink) !important;
+  font-family: Quicksand, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important;
+  line-height: 1.6; -webkit-font-smoothing: antialiased;
+}
+.dentico-home *, .dentico-booking *, .dentico-services *, .dentico-admin * { box-sizing: border-box; }
+.dentico-home h1, .dentico-home h2, .dentico-home h3,
+.dentico-booking h1, .dentico-booking h2, .dentico-booking h3,
+.dentico-services h1, .dentico-services h2, .dentico-services h3,
+.dentico-admin h1, .dentico-admin h2, .dentico-admin h3 {
+  color: var(--dc-ink); font-weight: 750 !important; letter-spacing: -.035em; line-height: 1.17;
+}
+body.dentico-home p, body.dentico-booking p, body.dentico-services p, body.dentico-admin p {
+  color: var(--dc-muted);
+}
+.dentico-home a, .dentico-booking a, .dentico-services a, .dentico-admin a {
+  color: var(--dc-blue); text-decoration: none;
+}
+.dentico-home a:hover, .dentico-booking a:hover, .dentico-services a:hover, .dentico-admin a:hover {
+  color: var(--dc-blue-dark); text-decoration: none;
+}
+.dentico-home a:focus-visible, .dentico-booking a:focus-visible, .dentico-services a:focus-visible,
+.dentico-admin a:focus-visible, .dentico-home button:focus-visible, .dentico-booking button:focus-visible,
+.dentico-admin button:focus-visible, .dentico-home input:focus-visible, .dentico-booking input:focus-visible,
+.dentico-services input:focus-visible, .dentico-admin input:focus-visible,
+.dentico-home select:focus-visible, .dentico-booking select:focus-visible,
+.dentico-admin select:focus-visible, .dentico-home textarea:focus-visible,
+.dentico-booking textarea:focus-visible {
+  outline: 3px solid #83baff; outline-offset: 3px;
+}
+.dc-container { width: min(1180px, calc(100% - 44px)); margin-inline: auto; }
+.dc-kicker { display: inline-flex; align-items: center; gap: .55rem; color: var(--dc-blue) !important;
+  font-size: .78rem; letter-spacing: .17em; font-weight: 800; text-transform: uppercase; }
+.dc-kicker:before { content: ""; width: 20px; height: 2px; background: currentColor; }
+.dc-lead { font-size: clamp(1.04rem, 1.6vw, 1.18rem); line-height: 1.75; max-width: 660px; }
+.dc-btn, body.dentico-booking .btn-primary, body.dentico-admin .btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: .65rem;
+  min-height: 48px; padding: .78rem 1.38rem;
+  border: 1px solid var(--dc-blue); border-radius: 13px;
+  color: #fff !important; background: var(--dc-blue);
+  font-size: .96rem; font-weight: 750;
+  box-shadow: 0 8px 19px rgba(23,103,221,.17);
+  transition: transform .2s, background .2s, box-shadow .2s;
+}
+.dc-btn:hover, body.dentico-booking .btn-primary:hover, body.dentico-admin .btn-primary:hover {
+  transform: translateY(-2px); background: var(--dc-blue-dark); border-color: var(--dc-blue-dark);
+  color: #fff !important; box-shadow: 0 13px 23px rgba(23,103,221,.2);
+}
+.dc-btn--light { color: var(--dc-ink) !important; background: #fff; border-color: #e4edf3; box-shadow: none; }
+.dc-btn--light:hover { color: var(--dc-blue) !important; background: #f8fbff; border-color: #bcd4eb; }
+.dc-btn--outline { color: var(--dc-blue) !important; border-color: #c7d8ef; background: transparent; box-shadow: none; }
+.dc-btn--outline:hover { color: #fff !important; }
+.dc-section { padding: clamp(66px, 8vw, 112px) 0; }
+.dc-section-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 36px; }
+.dc-section-heading h2 { max-width: 610px; font-size: clamp(2rem, 4vw, 3rem); margin: 12px 0 0; }
+.dc-section-heading p { max-width: 390px; margin: 0; }
+
+/* Shared navigation */
+.dc-topbar { z-index: 50; position: relative; width: 100%; background: rgba(255,255,255,.95);
+  border-bottom: 1px solid var(--dc-line); }
+.dc-topbar__inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 14px 30px; min-height: 84px; padding-block: 12px; }
+.dc-brand { display: inline-flex; align-items: center; gap: 12px; color: var(--dc-ink) !important;
+  font-size: 1.42rem; font-weight: 850; letter-spacing: -.055em; }
+.dc-brand__icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px;
+  background: linear-gradient(145deg, #1767dd, #0faaa5); color: white; font-size: 1.5rem; letter-spacing: -.07em; }
+.dc-nav { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 27px; }
+.dc-nav a:not(.dc-btn) { color: var(--dc-muted); font-size: .94rem; font-weight: 650; }
+.dc-nav a:not(.dc-btn):hover { color: var(--dc-blue); }
+.dc-nav .dc-btn { min-height: 42px; padding: .6rem 1rem; font-size: .89rem; }
+.dc-page-header { padding: 58px 0 34px; }
+.dc-page-header h1 { font-size: clamp(2.2rem, 4.5vw, 3.75rem); margin: 12px 0 17px; }
+.dc-page-header p { margin-bottom: 0; }
+
+/* Landing page */
+.dc-hero { overflow: hidden; position: relative; padding: clamp(70px, 9vw, 118px) 0;
+  background: radial-gradient(circle at 86% 16%, #dbf4f2 0, transparent 33%),
+  linear-gradient(130deg, #f7fbff 7%, #eaf3fb 100%); }
+.dc-hero__grid { display: grid; grid-template-columns: 1.02fr .98fr; align-items: center; gap: clamp(32px, 6vw, 90px); }
+.dc-hero__copy h1 { margin: 18px 0 24px; font-size: clamp(3.1rem, 6vw, 5.4rem); }
+.dc-hero__copy h1 em { font-style: normal; color: var(--dc-blue); }
+.dc-hero__copy .dc-lead { margin-bottom: 32px; }
+.dc-hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.dc-hero__note { font-size: .88rem; margin: 22px 0 0; }
+.dc-hero__visual { position: relative; min-height: 480px; border-radius: 36px 160px 36px 36px;
+  background: #deeff5 url("../img/about_us.jpg") center / cover no-repeat;
+  box-shadow: 0 30px 70px rgba(30,81,122,.16); }
+.dc-hero__visual:after { content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(180deg, transparent 45%, rgba(10,45,67,.24)); pointer-events: none; }
+.dc-hero__floating { position: absolute; z-index: 1; bottom: 28px; left: -35px; right: 40px;
+  max-width: 320px; display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; border-radius: 17px; background: #fff; box-shadow: var(--dc-shadow);
+  font-weight: 700; }
+.dc-hero__floating span { display: grid; place-items: center; width: 42px; height: 42px;
+  flex-shrink: 0; color: #057a72; border-radius: 13px; background: #e5f8f5; font-size: 1.5rem; }
+.dc-grid-3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 22px; }
+.dc-feature { background: var(--dc-card); border: 1px solid var(--dc-line); border-radius: var(--dc-radius);
+  padding: 30px; box-shadow: 0 7px 24px rgba(17,55,85,.035);
+  transition: transform .2s, box-shadow .2s; }
+.dc-feature:hover { transform: translateY(-4px); box-shadow: var(--dc-shadow); }
+.dc-feature__number { width: 50px; height: 50px; display: grid; place-items: center; color: var(--dc-blue);
+  border-radius: 15px; background: #eaf2ff; font-size: 1.15rem; font-weight: 800; margin-bottom: 26px; }
+.dc-feature h3 { font-size: 1.35rem; margin: 0 0 12px; }
+.dc-feature p { font-size: .98rem; min-height: 78px; }
+.dc-inline-link { font-weight: 750; }
+.dc-about { background: #fff; }
+.dc-about__layout { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(35px,6vw,95px); align-items: center; }
+.dc-about__art { min-height: 390px; background: url("../img/teeth.jpg") center / cover;
+  border-radius: 30px; box-shadow: var(--dc-shadow); }
+.dc-about h2 { font-size: clamp(2rem,4vw,3.2rem); margin: 14px 0 18px; }
+.dc-steps { list-style: none; padding: 0; margin: 27px 0 0; }
+.dc-steps li { display: flex; gap: 16px; margin-bottom: 21px; }
+.dc-steps strong { color: var(--dc-ink); }
+.dc-steps b { flex-shrink: 0; display: grid; place-items: center; height: 34px; width: 34px;
+  border-radius: 50%; background: #e6f1ff; color: var(--dc-blue); }
+.dc-cta { background: linear-gradient(120deg,#113654,#174e86); padding: 54px 0; }
+.dc-cta__inner { display: flex; justify-content: space-between; gap: 25px; align-items: center; }
+.dc-cta h2 { color: #fff; font-size: clamp(1.8rem,3.2vw,2.6rem); margin: 0 0 9px; }
+.dc-cta p { color: #c8ddeb !important; margin: 0; }
+.dc-contact { background: var(--dc-bg); }
+.dc-contact__layout { display: grid; grid-template-columns: .75fr 1.25fr; gap: 44px; align-items: start; }
+.dc-contact__info h2 { font-size: clamp(2rem,4vw,3.1rem); margin: 12px 0 20px; }
+.dc-contact__hours { margin-top: 26px; padding: 20px; border-radius: 15px;
+  border: 1px solid var(--dc-line); background: white; }
+.dc-contact__form { padding: 32px; border-radius: 25px; background: white;
+  border: 1px solid var(--dc-line); box-shadow: var(--dc-shadow); }
+.dc-contact__form h3 { font-size: 1.5rem; margin: 0 0 20px; }
+.dc-field { margin-bottom: 18px; }
+.dc-field label { display: block; font-size: .9rem; font-weight: 700; margin-bottom: 7px; color: var(--dc-ink); }
+.dc-field input, .dc-field textarea { width: 100%; min-height: 48px; padding: 12px 14px;
+  border-radius: 11px; border: 1px solid #cddbe6; background: #f9fbfe;
+  color: var(--dc-ink); font: inherit; }
+.dc-field textarea { min-height: 132px; resize: vertical; }
+.dc-field input:focus, .dc-field textarea:focus { background: #fff; border-color: var(--dc-blue); }
+.dc-map { background: white; padding: 36px 0 54px; }
+.dc-map #map { width: 100%; height: 310px; border-radius: 20px; }
+.dc-footer { background: #102e48; color: #d2e1eb; padding: 30px 0; font-size: .9rem; }
+.dc-footer__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+.dc-footer a { color: white !important; }
+
+/* Booking */
+body.dentico-booking .booking-page { max-width: 1180px; padding: 0 15px 80px; min-height: initial; }
+body.dentico-booking .booking-page > header { margin: 0 !important; background: transparent; height: auto !important;
+  min-height: 0; padding: 64px 0 36px; width: auto; display: block; position: static; }
+.dentico-booking .booking-page h1 { font-size: clamp(2.3rem,4.6vw,3.9rem); margin: 10px 0 17px; }
+body.dentico-booking .booking-note { font-size: 1.05rem; max-width: 700px; color: var(--dc-muted); line-height: 1.7; }
+.dc-booking-layout { display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 35px; align-items: start; }
+.dc-booking-aside { border-radius: 24px; padding: 32px; color: white;
+  background: linear-gradient(165deg,#103958,#14638b); box-shadow: var(--dc-shadow); }
+.dc-booking-aside h2 { color: white !important; font-size: 1.55rem; margin: 0 0 16px; }
+.dc-booking-aside p, .dc-booking-aside li { color: #d9ecf3 !important; font-size: .94rem; }
+.dc-booking-aside ol { margin: 22px 0 0; padding-left: 23px; }
+.dc-booking-aside li { margin-bottom: 19px; padding-left: 5px; }
+.dc-booking-aside__hours { padding: 16px 0 0; margin-top: 24px; border-top: 1px solid rgba(255,255,255,.22); }
+body.dentico-booking .booking-form { max-width: unset; border: 1px solid var(--dc-line);
+  border-radius: 23px; padding: clamp(22px,4vw,40px); background: white !important; box-shadow: var(--dc-shadow); }
+body.dentico-booking .booking-form label { font-weight: 700; font-size: .91rem; margin-bottom: 7px; }
+body.dentico-booking .booking-form .form-group { margin-bottom: 21px; }
+body.dentico-booking .booking-form .form-control { min-height: 48px; height: auto; padding: .7rem .88rem;
+  background: #f9fbfe; border: 1px solid #cbdae6; border-radius: 11px; color: var(--dc-ink);
+  box-shadow: none; }
+body.dentico-booking .booking-form textarea.form-control { min-height: 105px; }
+body.dentico-booking .booking-form .form-control:focus { border-color: var(--dc-blue); background: #fff;
+  box-shadow: 0 0 0 3px rgba(23,103,221,.11); }
+body.dentico-booking .booking-form .form-text { font-size: .82rem; line-height: 1.55; color: var(--dc-muted) !important; }
+body.dentico-booking .booking-form .btn-primary { width: 100%; }
+.dentico-booking .alert, .dentico-admin .alert, .dentico-services .alert {
+  border-radius: 13px; border-width: 1px; padding: 17px 21px; }
+
+/* Service catalogue */
+.dentico-services .services-page { padding: 0 15px 95px; min-height: 75vh; max-width: 1180px; }
+.dentico-services .services-page > header { margin-bottom: 42px !important; }
+.dentico-services .services-page h1 { font-size: clamp(2.3rem,4.5vw,3.7rem); }
+.dentico-services .service-card { position: relative; display: flex; flex-direction: column;
+  height: 100%; padding: 32px; border: 1px solid var(--dc-line); border-radius: 22px;
+  background: white; box-shadow: 0 7px 24px rgba(17,55,85,.045); }
+.dentico-services .service-card:before { content: ""; display: block; width: 44px; height: 5px;
+  border-radius: 999px; background: linear-gradient(90deg,var(--dc-blue),var(--dc-teal)); margin-bottom: 22px; }
+.dentico-services .service-card h2 { font-size: 1.45rem; margin-bottom: 16px; }
+.dentico-services .service-card .service-meta { color: var(--dc-muted); font-size: .9rem; margin-top: auto; }
+.dentico-services .service-card .service-price { font-size: 1.05rem; font-weight: 800;
+  color: var(--dc-ink); border-top: 1px solid var(--dc-line); padding-top: 20px; margin-top: 20px; }
+.dentico-services .service-card__cta { margin-top: 18px; }
+
+/* Administration */
+body.dentico-admin .admin-page { padding: 0 24px 85px; min-height: 100vh; max-width: 1340px;
+  background: none !important; color: var(--dc-ink) !important; }
+body.dentico-admin .admin-page > header { padding: 55px 0 30px; margin: 0 !important;
+  position: static; height: auto !important; width: auto; background: none; display: block; }
+.dentico-admin .admin-page h1 { font-size: clamp(2.2rem,4vw,3.5rem); margin: 10px 0; }
+.dentico-admin .admin-page > header p { font-size: 1.05rem; }
+.dentico-admin .admin-panel, .dentico-admin .request-card { background: white !important;
+  border: 1px solid var(--dc-line); border-radius: 22px; box-shadow: 0 9px 27px rgba(17,55,85,.045); }
+.dentico-admin .admin-panel { padding: 28px; }
+.dentico-admin .admin-login { max-width: 490px; padding: 38px; margin: 0 auto; }
+.dentico-admin .admin-login h2 { margin-bottom: 28px; }
+.dentico-admin .admin-page .form-control { min-height: 42px; border: 1px solid #cbd9e3;
+  border-radius: 10px; color: var(--dc-ink); background: #f9fbfe; }
+.dentico-admin .admin-page .form-control:focus { border-color: var(--dc-blue); background: white;
+  box-shadow: 0 0 0 3px rgba(23,103,221,.12); }
+.dentico-admin .admin-page label { font-weight: 700; font-size: .88rem; }
+.dentico-admin .calendar-days { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 14px; }
+.dentico-admin .calendar-day { padding: 18px; min-height: 180px; background: #f8fbfd;
+  border: 1px solid var(--dc-line); border-radius: 15px; }
+.dentico-admin .calendar-day h3 { font-size: .98rem; font-weight: 800; margin: 0 0 15px; }
+.dentico-admin .calendar-appointment { padding: 13px; background: #e7f5f0;
+  border: 1px solid #b9e7d7; border-radius: 12px; color: #144c42; margin-bottom: 10px; }
+.dentico-admin .calendar-appointment strong, .dentico-admin .calendar-appointment div { color: #144c42 !important; }
+.dentico-admin .calendar-appointment a { font-weight: 750; }
+.dentico-admin .calendar-day--empty { font-size: .88rem; }
+.dentico-admin .request-card { padding: 25px 27px; margin-bottom: 16px; }
+.dentico-admin .request-card h2 { font-size: 1.2rem; max-width: 80%; }
+.dentico-admin .request-card .badge { border-radius: 99px; padding: .48rem .78rem;
+  font-size: .75rem; letter-spacing: .01em; }
+.dentico-admin .request-meta { color: var(--dc-muted) !important; line-height: 1.9; font-size: .9rem; }
+.dentico-admin .request-note { padding: 13px 16px; border-radius: 10px; background: #f5f8fb; }
+.dentico-admin .request-card .form-inline { padding-top: 13px; border-top: 1px solid var(--dc-line); }
+.dentico-admin .request-card .btn-primary { min-height: 42px; padding: .55rem 1.05rem; }
+.dentico-admin .btn-outline-secondary { border-color: #c8d8e5; color: var(--dc-ink); border-radius: 10px; }
+.dentico-admin .btn-outline-secondary:hover { background: #eaf3fa; color: var(--dc-blue); }
+.dentico-admin .admin-summary { display: inline-flex; align-items: center; gap: 12px;
+  padding: 13px 20px; border: 1px solid var(--dc-line); border-radius: 13px;
+  background: #fff; color: var(--dc-ink); font-weight: 650; }
+.dentico-admin .admin-summary strong { color: var(--dc-blue); font-size: 1.4rem; }
+.dentico-admin .admin-pagination { display: flex; gap: 6px; padding: 0; list-style: none; }
+.dentico-admin .admin-pagination li { display: block; }
+.dentico-admin .page-link { border-radius: 9px !important; border: 1px solid var(--dc-line); }
+.dentico-admin .page-item.disabled .page-link { background: #eaf0f6; }
+
+@media (max-width: 1060px) {
+  .dentico-admin .calendar-days { grid-template-columns: repeat(3,minmax(0,1fr)); }
+}
+@media (max-width: 850px) {
+  .dc-hero__grid, .dc-about__layout, .dc-contact__layout, .dc-booking-layout { grid-template-columns: 1fr; }
+  .dc-hero__visual { min-height: 360px; max-width: 550px; }
+  .dc-grid-3 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .dc-booking-aside { order: 2; }
+  .dentico-admin .calendar-days { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+  .dc-container { width: min(100% - 28px, 1180px); }
+  .dc-topbar__inner { align-items: flex-start; min-height: 0; }
+  .dc-nav { gap: 12px 17px; }
+  .dc-nav a:not(.dc-btn) { font-size: .85rem; }
+  .dc-nav .dc-btn { width: 100%; }
+  .dc-hero__visual { min-height: 295px; border-radius: 24px 85px 24px 24px; }
+  .dc-hero__floating { left: 12px; bottom: 12px; right: 12px; max-width: unset; padding: 13px; }
+  .dc-grid-3 { grid-template-columns: 1fr; }
+  .dc-section-heading, .dc-cta__inner { align-items: start; flex-direction: column; }
+  .dc-contact__form { padding: 22px; }
+  body.dentico-booking .booking-page { padding: 0 15px 55px; }
+  body.dentico-booking .booking-page > header { padding-top: 42px; }
+  body.dentico-admin .admin-page { padding: 0 14px 55px; }
+  body.dentico-admin .admin-page > header { padding-top: 38px; }
+  .dentico-admin .admin-panel { padding: 18px; }
+  .dentico-admin .calendar-days { grid-template-columns: 1fr; }
+  .dentico-admin .request-card h2 { max-width: unset; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .dc-btn, .dc-feature { transition: none; }
+}
+
+
+/* Dentico signature look: preserve the original full-bleed teal/photo visual language.
+   These additions deliberately come after the shared responsive UI rules. */
+.dentico-home .dc-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(7, 79, 83, .44);
+  backdrop-filter: blur(13px);
+  -webkit-backdrop-filter: blur(13px);
+  border-color: rgba(255, 255, 255, .3);
+}
+.dentico-home .dc-brand, .dentico-home .dc-nav a:not(.dc-btn) {
+  color: #fff !important;
+  text-shadow: 0 1px 6px rgba(4, 47, 51, .32);
+}
+.dentico-home .dc-nav a:not(.dc-btn):hover { color: #b7f8ee !important; }
+.dc-brand__icon {
+  background: linear-gradient(140deg, #00bbae, #007b79);
+  border: 1px solid rgba(255,255,255,.3);
+}
+.dc-brand__icon svg { display: block; width: 26px; height: 26px; fill: white; }
+.dentico-home .dc-brand__icon { background: rgba(255,255,255,.12); }
+.dentico-home .dc-btn:not(.dc-btn--light) { background-color: #00bbae; border-color: #00bbae; }
+.dentico-home .dc-btn:not(.dc-btn--light):hover { background-color: #008d85; border-color: #008d85; }
+.dc-btn, .dentico-booking .btn-primary, .dentico-admin .btn-primary {
+  box-shadow: 0 8px 19px rgba(0, 125, 125, .17);
+}
+.dentico-home .dc-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(900px, 100vh);
+  padding: 158px 0 92px;
+  background:
+    linear-gradient(125deg, rgba(4, 43, 55, .72), rgba(0, 135, 130, .4)),
+    url("../img/bg_2_blurred.jpg") center / cover no-repeat;
+  text-align: center;
+  color: white;
+}
+.dentico-home .dc-hero:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 43%, rgba(16,220,205,.17), transparent 47%);
+}
+.dentico-home .dc-hero__center { position: relative; z-index: 1; width: min(900px,calc(100% - 32px)); }
+.dc-hero__mark {
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  width: clamp(120px, 16vw, 206px);
+  height: clamp(120px, 16vw, 206px);
+  filter: drop-shadow(0 8px 13px rgba(0,0,0,.25));
+}
+.dc-hero__mark svg { display: block; width: 100%; height: 100%; fill: white; }
+.dc-hero__eyebrow {
+  margin: 0 !important;
+  font-size: .83rem;
+  text-transform: uppercase;
+  letter-spacing: .33em;
+  font-weight: 700;
+  color: #b6faf1 !important;
+}
+.dentico-home .dc-hero h1 {
+  margin: 8px 0 2px;
+  font-size: clamp(4.5rem, 11vw, 9.2rem);
+  line-height: 1.02;
+  font-weight: 400 !important;
+  letter-spacing: .07em;
+  color: #fff;
+  text-shadow: 0 5px 22px rgba(0,38,44,.42);
+}
+.dentico-home .dc-hero__tagline {
+  font-size: clamp(1.05rem,2.3vw,1.65rem);
+  color: #fff !important;
+  letter-spacing: .25em;
+  font-weight: 500;
+  margin: 10px 0 26px;
+  text-shadow: 0 2px 10px rgba(0,30,30,.45);
+}
+.dentico-home .dc-hero__intro {
+  max-width: 600px; margin: 0 auto 31px;
+  color: #e2f8f6 !important;
+  font-size: 1.05rem; line-height: 1.75;
+}
+.dentico-home .dc-hero__actions { justify-content: center; }
+.dentico-home .dc-hero__actions .dc-btn { min-width: 205px; border-radius: 100px; }
+.dentico-home .dc-hero__note { color: #c8ece9 !important; margin: 19px 0 0; font-size: .86rem; }
+.dentico-home .dc-hero__scroll {
+  position: absolute;
+  left: 50%; bottom: 22px; transform: translateX(-50%);
+  z-index: 1;
+  font-weight: 650;
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  white-space: nowrap;
+  color: #e5fcf9 !important;
+}
+.dentico-home .dc-hero__scroll span { font-size: 1.2rem; vertical-align: -1px; padding-left: 5px; }
+.dentico-home #treatments.dc-section {
+  padding: 96px 0 106px;
+  background: linear-gradient(155deg, #00a99f, #007f7d);
+}
+.dentico-home #treatments .dc-kicker,
+.dentico-home #treatments h2,
+.dentico-home #treatments .dc-section-heading p {
+  color: #fff !important;
+}
+.dentico-home #treatments .dc-kicker:before { background: white; }
+.dentico-home #treatments .dc-feature {
+  text-align: center;
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(255,255,255,.57);
+  box-shadow: 0 15px 35px rgba(0,49,50,.12);
+  border-radius: 20px;
+  padding: 32px 24px;
+}
+.dc-feature__art {
+  display: block;
+  width: 145px; height: 145px;
+  object-fit: contain;
+  margin: 0 auto 25px;
+  filter: drop-shadow(0 8px 9px rgba(2, 87, 90, .08));
+}
+.dentico-home #treatments .dc-feature p {
+  min-height: 74px; margin-bottom: 15px;
+}
+.dentico-home #treatments .dc-inline-link { color: #008d87; }
+.dentico-home .dc-about {
+  position: relative;
+  background: linear-gradient(135deg,rgba(237,253,251,.89),rgba(255,255,255,.92)),
+  url("../img/teeth.jpg") center/cover no-repeat;
+}
+.dentico-home .dc-about__art {
+  background: url("../img/about_us.jpg") center/cover no-repeat;
+  border: 9px solid rgba(255,255,255,.8);
+  border-radius: 6px;
+  box-shadow: 0 19px 45px rgba(0,81,82,.14);
+}
+.dentico-home .dc-cta {
+  background: linear-gradient(115deg, #008d87, #005c62);
+}
+.dentico-home .dc-footer {
+  background: #064b52;
+}
+.dentico-home .dc-contact {
+  background: linear-gradient(180deg, #f2faf9 0%, #e9f5f4 100%);
+}
+.dentico-home .dc-contact__form {
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(0,167,157,.19);
+  border-radius: 17px;
+}
+.dentico-home .dc-form-hint { font-size: .82rem; line-height: 1.55; margin-bottom: 18px; }
+.dc-contact__hours { border-left: 4px solid #00bbae; }
+
+/* Bring the legacy teal and soft photographic glass effect into application pages. */
+body.dentico-booking, body.dentico-services, body.dentico-admin {
+  background:
+    linear-gradient(rgba(237,249,248,.90), rgba(237,249,248,.95)),
+    url("../img/bg_2_blurred.jpg") center top / cover fixed no-repeat !important;
+}
+body.dentico-booking .booking-form,
+.dentico-services .service-card,
+.dentico-admin .admin-panel,
+.dentico-admin .request-card {
+  background: rgba(255,255,255,.91) !important;
+  border: 1px solid rgba(0,143,138,.21);
+  box-shadow: 0 15px 30px rgba(1,75,84,.09);
+}
+.dc-booking-aside {
+  background: linear-gradient(160deg, rgba(0,157,149,.95), rgba(1,103,108,.97));
+}
+.dc-booking-aside p, .dc-booking-aside li { color: #ecfffc !important; }
+.dc-booking-aside__hours { border-color: rgba(255,255,255,.3); }
+.dentico-services .service-card:before {
+  background: linear-gradient(90deg,#00bbae,#006d70);
+}
+.dentico-admin .calendar-appointment {
+  background: #ddf6f0;
+  border-color: #a5e1d5;
+}
+.dentico-admin .admin-summary strong { color: #008e87; }
+
+@media (max-width: 850px) {
+  .dentico-home .dc-hero { min-height: 770px; }
+  .dentico-home .dc-hero__center { width: min(650px, calc(100% - 32px)); }
+}
+@media (max-width: 600px) {
+  .dentico-home .dc-topbar { position: relative; background: #075961; }
+  .dentico-home .dc-hero {
+    min-height: 690px;
+    padding: 60px 0 86px;
+    background-position: center;
+  }
+  .dentico-home .dc-hero h1 { font-size: clamp(3.65rem, 15vw, 5.7rem); letter-spacing: .015em; }
+  .dentico-home .dc-hero__tagline { letter-spacing: .09em; margin-bottom: 18px; }
+  .dentico-home #treatments.dc-section { padding: 65px 0; }
+  .dentico-home .dc-hero__actions .dc-btn { width: 100%; }
+  body.dentico-booking, body.dentico-services, body.dentico-admin { background-attachment: scroll !important; }
+}
+
+/* Fixed hero background on desktop */
+@media (min-width: 601px) {
+  .dentico-home .dc-hero {
+    background-attachment: fixed;
+  }
+}
+/* Explore Care: let the artwork occupy approximately half of each card. */
+.dentico-home #treatments .dc-feature {
+  display: grid;
+  grid-template-rows: minmax(230px, 1fr) minmax(230px, 1fr);
+  min-height: 460px;
+  padding: 0;
+  overflow: hidden;
+}
+.dentico-home #treatments .dc-feature__media {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 15px;
+  background: linear-gradient(145deg, rgba(218, 250, 245, .94), rgba(166, 228, 221, .56));
+}
+.dentico-home #treatments .dc-feature__art {
+  display: block;
+  width: min(92%, 275px);
+  height: 208px;
+  max-width: 100%;
+  object-fit: contain;
+  margin: 0;
+  filter: drop-shadow(0 10px 12px rgba(0, 91, 86, .13));
+}
+.dentico-home #treatments .dc-feature__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px 25px 28px;
+}
+.dentico-home #treatments .dc-feature__body h3 { margin-bottom: 12px; }
+.dentico-home #treatments .dc-feature__body p {
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 16px;
+}
+.dentico-home #treatments .dc-feature__body .dc-inline-link {
+  margin-top: auto;
+}
+@media (max-width: 600px) {
+  .dentico-home #treatments .dc-feature {
+    grid-template-rows: 210px minmax(200px,auto);
+    min-height: 410px;
+  }
+  .dentico-home #treatments .dc-feature__art { height: 185px; }
+}

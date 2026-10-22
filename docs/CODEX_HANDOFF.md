@@ -1,83 +1,53 @@
-# Dentico – átadás a Codex fejlesztőkörnyezetnek
+# Dentico – aktuális átadás a Codexnek
 
-Frissítve: 2026-10-20
+Frissítve: 2026-10-22. Ez a dokumentum felülírja a korábbi, 2026-10-20-i Codex-átadási tervet.
 
-## 1. A projekt célja
+## 1. Projektállapot és Git
 
-A Dentico egy fogászati rendelő PHP 8.0+ / MySQL alapú webalkalmazása. Meglévő nyilvános weboldalból fejlődik foglalási rendszerré. A cél a meglévő működés biztonságos, fokozatos továbbfejlesztése, nem teljes technológiaváltás.
+- Repo: https://github.com/gfodor85/dentico
+- **`master`**: a teljes, beolvasztott PHP/MySQL foglalási és biztonsági fejlesztést tartalmazza a 2026. október 21-én sikeresen beolvasztott [PR #12](https://github.com/gfodor85/dentico/pull/12) után. A korábbi PR #4 és #5 lezárt; ne próbáld őket újra beolvasztani.
+- **`feature/ui-refresh-2026`**: a jelenlegi aktív vizuális fejlesztési ág, [draft PR #13](https://github.com/gfodor85/dentico/pull/13) a `master` ellen. **A következő UI-változtatásokat ezen az ágon végezd**. Merge csak felhasználói jóváhagyás után.
+- A felhasználó a Codex Windows-alkalmazásban folytatja a fejlesztést. A cél, hogy a Codex közvetlenül szerkessze, ellenőrizze és frissítse a helyi projektet; ne kérjen folyamatos PowerShell-kódmásolást.
 
-## 2. Repo és branchállapot
+## 2. Windows/XAMPP mappák
 
-- GitHub: https://github.com/gfodor85/dentico
-- `master`: alapértelmezett ág; **nem** ez a jelenlegi PHP-fejlesztés legfrissebb alapja.
-- `feature/php-pdo-foundation`: az új PDO- és foglalási fejlesztés fő munkaváltozata.
-- PR #3 (`feature/session-security` → `feature/php-pdo-foundation`): 2026-10-20-án beolvasztva; HttpOnly, SameSite=Lax, HTTPS esetén Secure PHP session cookie paraméterek az `admin.php` és `booking.php` fájlokban.
-- `feature/admin-logout-security`: a fentire épülő, még külön álló admin-kijelentkezési javítás (régi session adatainak törlése, session cookie lejáratása, szerveroldali session megszüntetése, átirányítás). Nem kezelendő úgy, mintha már be lenne olvasztva.
-- `feature/codex-handoff`: a Codexnek szánt átadási dokumentumok ága; a `feature/admin-logout-security` ágból készült, tehát a fenti logout-javítást is tartalmazza.
+- Git munkamappa: `D:\WEB_DEV\Dentico-GitHub`.
+- **Védendő eredeti, működő XAMPP-projekt**: `D:\WEB_DEV\xampp\htdocs\Dentico`.
+- **Vizuális előnézet**: `D:\WEB_DEV\xampp\htdocs\Dentico-Preview`.
+- Böngészős URL: `http://localhost/Dentico-Preview/`.
+- A preview a helyi `dentico` MySQL-adatbázist használhatja. Vizuális teszt közben ne módosíts élő/valós adatokat és ne küldj valódi leveleket.
+- A helyi `config/database.php`, `config/admin.php`, `config/mail.php`, `config/maps.php`, valamint a `vendor/` privát/lokális. Ne publikáld, ne módosítsd indokolatlanul és ne másold be chatbe az értéküket.
 
-**Mielőtt új fejlesztés indul:** ellenőrizd a branchállapotot és a célágat. Ne készíts véletlenül PR-t `master` ellen; a munkaágak integrálásáról a tulajdonos dönt.
+## 3. Jelenlegi UI-irány: eredeti Dentico + modern használhatóság
 
-## 3. Helyi fejlesztési környezet
+A felhasználó kimondottan az **eredeti** Dentico-arculatot kedveli, nem a generikus fehér-kék rendelői sablont. Megtartandó:
 
-- Operációs rendszer: Windows; webkiszolgáló/adatbázis: XAMPP (Apache és MySQL/MariaDB).
-- Tipikus helyi mappa: `D:\WEB_DEV\xampp\htdocs\Dentico`.
-- Böngészős cím: `http://localhost/Dentico/`; phpMyAdmin: `http://localhost/phpmyadmin`.
-- DB: `dentico`, `utf8mb4_unicode_ci`.
-- Sémaleírás és kezdeti tesztadatok: `database/schema.sql`.
-- A `config/database.example.php`, `config/admin.example.php` és `config/mail.example.php` mintákból készülnek a gitignore-olt helyi konfigurációk. Ne olvasd be vagy másold fel a valós jelszavakat, SMTP-adatokat és betegadatokat.
-- Composer: `composer.json`, PHPMailer `^6.10`; `composer install` után a gyökérszintű `vendor/` könyvtár lokális. A régebbi kapcsolatfelvételi funkcióhoz külön, verziókezelt vendorkód is létezik az `assets/php/contact-form/vendor/` alatt; ezt ne módosítsd mellékesen.
+- A türkiz `#00bbae` és Quicksand betűtípus.
+- Az eredeti SVG-embléma (`assets/img/svg/symbols.svg#hero-img`), „Dentico” cím és **Your Smile. Our Passion.** szlogen.
+- A nagy, eredeti fotós hero (`assets/img/bg_2_blurred.jpg`), türkizes overlay és áttetsző panelhangulat.
+- A hero **desktopon fixed háttérrel** rendelkezzen, mobilon normál scrollos háttérrel.
+- A „Welcome to” felirat **nem kell** a hero részben.
+- Az „Explore Care” három kártyájában az eredeti kezelési illusztrációk láthatók; a **kártyák felső kb. 50%-át a képek** foglalják el.
+- A modernizált reszponzív foglalási űrlap, szolgáltatáskártyák és adminnaptár maradjon használható és olvasható.
 
-## 4. Jelenleg megvalósított fő funkciók
+Fájlok: `index.php`, `assets/css/dentico-ui.css`, `partials/ui-header.php`, `partials/form.php`, `services.php`, `booking.php`, `admin.php`. A korábbi minimalizált `assets/css/main.css` más örökölt oldalak számára még megvan; ne módosítsd ok nélkül.
 
-- Nyilvános weboldal és kapcsolatfelvételi funkció (`index.php`, `services.php`, `partials/`, `assets/`).
-- Szolgáltatás- és időpontválasztás; 15 perces időközök; hétfő–péntek 08:00–17:00 alapnyitvatartás (`booking.php`, `available-slots.php`).
-- PDO-alapú adatbázis (`app/database.php`), `services` és `appointment_requests` táblák (`database/schema.sql`).
-- Beérkező kérések `pending` állapotban; az adminfelület képes jóváhagyni és lemondani, ütköző jóváhagyott foglalások ellenőrzésével (`admin.php`).
-- Adminjelszó-hash és PHP session-alapú beléptetés, CSRF-védelem, session ID-regenerálás belépéskor; legutóbb javított kijelentkezés.
-- Foglalási és státuszváltozási e-mail-értesítések PHPMailerrel (`app/mailer.php`), a levélküldés hibája önmagában nem törli a sikeresen mentett foglalást.
+## 4. Működés és biztonság, amit meg kell őrizni
 
-## 5. Amit már manuálisan ellenőriztünk
+- PHP 8+, PDO/MySQL, Bootstrap 4 néhány alkalmazási oldalon, PHPMailer/Composer.
+- Foglalás: `booking.php`, `available-slots.php`; 15 perces kezdési lépések, hétfő–péntek 08:00–17:00; új kérelem `pending`; elérhetőség a szolgáltatáshossztól és jóváhagyott foglalásoktól függ.
+- Admin: `admin.php`; hitelesített, CSRF-védett jóváhagyás/törlés; ütköző jóváhagyások ellen InnoDB napi zárolás `appointment_day_locks`; jelszó és session-cookie biztonsági korlátok.
+- Ne változtasd meg a POST mezőneveket, hitelesítést, CSRF-et, prepared statementeket, foglalási szabályokat vagy tranzakciókat pusztán a design miatt.
+- A `database/migrations/20261020_security_hardening.sql` **korábban már lefutott a helyi adatbázison**. Ne futtasd újra. Új telepítésnél az aktuális `database/schema.sql` az alap.
+- Korábban sikeres helyi tesztek: foglalási és adminállapot-műveletek, session/logout, CSRF, rate limit, elérhető időpontok és párhuzamos, ütköző jóváhagyási teszt. A mostani UI-branch **még nem kapott teljes helyi lint + böngészős smoke testet**; ne állítsd, hogy igen.
 
-- A tulajdonos visszajelzése szerint a booking és admin oldal az új session-beállításokkal helyben működött.
-- Chrome DevTools alatt a PHPSESSID cookie `HttpOnly=true` és `SameSite=Lax` volt; helyi HTTP mellett a `Secure` nem volt bekapcsolva (várható működés).
-- A kijelentkezés után az adminfelület helyett a bejelentkező képernyő jelent meg; új, nem hitelesített PHPSESSID létrejötte az új munkamenet/CSRF miatt normális.
-- **Nem igazolt:** automatizált tesztek, teljes biztonsági audit, terhelés alatti foglalásütközések és éles üzemre alkalmasság. Ezeket külön meg kell vizsgálni.
+## 5. Munkafolyamat a Codexnek
 
-## 6. Első Codex-feladat – csak olvasási audit
+1. Nyisd meg helyben a `D:\WEB_DEV\Dentico-GitHub` mappát, ellenőrizd a `feature/ui-refresh-2026` branchet és a tiszta munkamappát. A felhasználó megadott aktuális vizuális kéréseit ezen a branchen végezd.
+2. Módosítsd közvetlenül a fájlokat, és ahol van, futtasd a `php -l` és célzott ellenőrzéseket. Új SQL-migrációra nincs szükség UI-feladathoz.
+3. Az előnézethez használd a repo `tools/Refresh-Dentico-Preview.cmd` és `tools/refresh-preview.ps1` segédprogramjait, vagy kontrollált, ekvivalens lokális szinkront a Git working tree-ből. A segédprogram clean worktree-t és jó branchet igényel, `git pull --ff-only`-t végez, nem tükröz törléssel, nem másol `config/`, `vendor/`, `.git/` könyvtárakat.
+4. Az eredeti `D:\WEB_DEV\xampp\htdocs\Dentico` mappát ne írd felül.
+5. Új commitot/push-t csak a fejlesztési ágra készíts; PR #13 draft maradjon a helyi vizuális/üzemi tesztek végéig. `master` merge vagy élesítés csak tulajdonosi jóváhagyással.
+6. A felhasználónak mindig röviden jelezd: mi változott, mely fájlokban, mit teszteltél ténylegesen, és hol lehet megnézni az eredményt. A felhasználó lehetőleg ne kapjon bemásolandó parancsblokkokat, ha az alkalmazás futtathatja őket.
 
-Vizsgáld át a projekt saját alkalmazáskódját, a helyi konfigurációs mintákat, a sémát és a dokumentációt. Az első körben **ne módosíts fájlokat és ne nyiss PR-t**.
-
-Az audit térjen ki a következőkre:
-
-1. Adminhitelesítés, jogosultság, kijelentkezés, session/cookie és CSRF.
-2. SQL injection, XSS, bemenetellenőrzés, hibakezelés és adatvédelmi kockázatok.
-3. Foglalási versenyhelyzetek, tranzakciók és az azonos időpontot érintő párhuzamos műveletek.
-4. Az `available-slots.php`, `booking.php` és `admin.php` eltérő szabályainak lehetséges inkonzisztenciái (dátum/időzóna, rendelési idő, státuszkezelés).
-5. PHPMailer, Composer, régi verziókezelt harmadik féltől származó függőségek és karbantarthatóság.
-6. Tesztelhetőség és javasolt automatikus tesztek; különítsd el, mit tudsz helyben futtatni, és mit kell XAMPP+MySQL alatt manuálisan ellenőrizni.
-
-Az eredményben minden lényeges megállapításhoz adj súlyosságot, pontos fájl-/kódhelyet, rövid indoklást, konkrét javítási javaslatot és teszttervet. Ne nevezz feltételezett problémát igazolt sérülékenységnek bizonyíték nélkül.
-
-## 7. Biztonsági javítási kör (nyitott PR #5)
-
-A `feature/codex-security-hardening` ág a `feature/codex-handoff` ágra készített, még be nem olvasztott javításokat tartalmaz:
-
-- Admin inaktivitási lejárat (30 perc), PHP strict session mód és egységes `Europe/Budapest` időzóna.
-- Öt adminbelépési, foglalási vagy kontaktűrlap-kérés engedélyezett kliens-IP-címenként 15 perc alatt; CSRF-ellenőrzés a kontaktűrlapon.
-- Közös root Composer PHPMailer használata a kontaktűrlapon, szerveroldali bemenetellenőrzés és HTML-escaping; mailerhiba nem fordítja vissza a már elmentett foglalást vagy státuszt.
-- Adminjóváhagyások dátumonkénti InnoDB-zárolása, tiltott státuszátmenetek és múltbeli foglalás jóváhagyásának elutasítása.
-- A foglaláskori szolgáltatáshossz rögzítése, valamint adminlista lapozása és külön heti naptárlekérdezés.
-- Meglévő adatbázisnál egyszer alkalmazandó: `database/migrations/20261020_security_hardening.sql`. Új adatbázisnál a frissített `database/schema.sql` használható. Az alkalmazás nem futtat automatikus migrációt.
-
-A módosított PHP-fájlok PHP 8.2.12 lintje sikeres. MySQL-konkurenciateszt, böngészős CSRF/XSS-próba és SMTP-integráció nincs igazolva; ezeket XAMPP-ban kell elvégezni a migráció alkalmazása után.
-
-## 8. Ajánlott következő szakaszok
-
-- Audit-jelentés közös áttekintése és prioritások kijelölése.
-- Külön feature branchekben, kis PR-eken keresztül a valódi hibák javítása.
-- PHP-lint, célzott automatikus tesztek és XAMPP/MySQL integrációs ellenőrzések bevezetése.
-- Később fokozatos UX-, admin- és foglalási fejlesztések; a már működő PHP-rendszer megtartásával.
-
-## 9. Fejlesztési szabály
-
-A repo gyökerében található `AGENTS.md` tartalmazza a Codex számára szóló általános projektutasításokat. Változtatás, adatbázis-migráció, külső levélküldés, éles telepítés vagy merge előtt a tulajdonos jóváhagyása szükséges.
+További részletes szabályok: `AGENTS.md` és `README.md`.

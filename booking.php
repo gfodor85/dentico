@@ -242,57 +242,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Request an Appointment | Dentico</title>
-    <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <style>
-        html { min-height: 100%; }
-
-        body.booking-body {
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f3f6fa !important;
-            background-image: url("assets/img/bg_2_blurred.jpg") !important;
-            background-position: center center;
-            background-size: cover;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-
-        body.booking-body .booking-page {
-            padding: 4rem 0;
-            min-height: 100vh;
-        }
-
-        body.booking-body .booking-form {
-            max-width: 760px;
-            padding: 2rem;
-            border: 1px solid rgba(229, 231, 235, 0.75);
-            border-radius: .5rem;
-            background: rgba(255, 255, 255, 0.60) !important;
-        }
-
-        body.booking-body .booking-form label,
-        body.booking-body .booking-form .form-text,
-        body.booking-body header h1,
-        body.booking-body header p {
-            color: #212529;
-        }
-
-        .booking-note { font-size: .95rem; }
-
-        @media (max-width: 576px) {
-            body.booking-body .booking-form { padding: 1.25rem; }
-            body.booking-body .booking-page { padding: 2rem 15px; }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/dentico-ui.css">
 </head>
-<body class="booking-body">
+<body class="booking-body dentico-booking">
+    <?php include __DIR__ . '/partials/ui-header.php'; ?>
     <main class="container booking-page">
-        <p><a href="index.php">&larr; Back to Dentico homepage</a></p>
         <header class="mb-4">
-            <h1>Request an Appointment</h1>
+            <span class="dc-kicker">Plan your visit</span>
+            <h1>Request an appointment</h1>
             <p class="booking-note">Opening hours: Monday–Friday, 08:00–17:00. The clinic will contact you to confirm the appointment.</p>
         </header>
+
+        <div class="dc-booking-layout">
+            <aside class="dc-booking-aside" aria-label="How booking works">
+                <h2>Easy as 1, 2, 3.</h2>
+                <p>Request a suitable time in a few steps. You will hear back after the clinic reviews your request.</p>
+                <ol>
+                    <li>Select a treatment.</li>
+                    <li>Choose a date and available time.</li>
+                    <li>Submit your details for confirmation.</li>
+                </ol>
+                <div class="dc-booking-aside__hours"><strong>Opening hours</strong><p>Monday–Friday<br>08:00–17:00</p></div>
+            </aside>
+            <div class="dc-booking-main">
 
         <?php if ($databaseError): ?>
             <div class="alert alert-danger" role="alert">
@@ -374,9 +347,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$databaseError) {
                     <small class="form-text text-muted">Please do not include sensitive medical information in this field.</small>
                 </div>
 
-                <button class="btn btn-primary" type="submit">Send appointment request</button>
+                <button class="btn btn-primary" type="submit">Send appointment request <span aria-hidden="true">&rarr;</span></button>
             </form>
         <?php endif; ?>
+            </div>
+        </div>
     </main>
     <?php if (!$databaseError && $services !== []): ?>
     <script>

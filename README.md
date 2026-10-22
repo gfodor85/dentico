@@ -65,3 +65,47 @@ is not loaded.
 Restrict the key in Google Cloud to the Maps JavaScript API
 and approved HTTP referrers. Revoke previously exposed keys.
 Do not commit credentials or API keys.
+
+## 2026 UI refresh (preview branch)
+
+The first responsive visual refresh uses `assets/css/dentico-ui.css` and a shared
+`partials/ui-header.php` for the home, treatment catalogue, booking and admin pages.
+The home page is a **demo**; replace the sample content, photography, map coordinates
+and clinic information before production.
+
+The layout-only updates to `booking.php` and `admin.php` deliberately leave POST
+field names, CSRF tokens, PHP validation, booking availability logic and database
+transactions unchanged. The contact form retains its existing POST action and token.
+
+### Local XAMPP smoke test before merge
+
+1. Check out the UI feature branch in a separate worktree or directory.
+2. Run `php -l` against `index.php`, `booking.php`, `admin.php`,
+   `services.php`, `partials/form.php`, and `partials/ui-header.php`.
+3. Open the home, services, booking and admin routes at mobile and desktop widths.
+4. Check that the booking form loads slots and submits successfully using **synthetic**
+   test data; verify confirmation still needs admin approval.
+5. Check the login form, admin calendar, request cards and status update forms.
+6. Check the contact CSRF field. Do not send mail unless an approved test SMTP sink
+   is configured. Do not copy private `config/*.php` files into the repository.
+7. Ensure Maps stays optional when no restricted API key is configured.
+
+This stylesheet does not require a CSS build step.
+
+### One-click Windows preview refresh
+
+After the initial branch checkout, run `git pull --ff-only origin
+feature/ui-refresh-2026` once to acquire the helper scripts. Thereafter,
+double-click `tools/Refresh-Dentico-Preview.cmd`. It calls
+`tools/refresh-preview.ps1` to fast-forward the **UI feature branch** and
+copy its working files into `D:\\WEB_DEV\\xampp\\htdocs\\Dentico-Preview`.
+
+The helper refuses to run if the wrong branch is checked out, the local working
+tree is dirty, or the preview folder does not exist. It uses `robocopy /E`
+(not `/MIR`), so it does **not delete** preview-only files. It excludes
+`.git`, `config`, `vendor`, `.codex` and `tools`; local DB/admin/mail/maps
+config and installed Composer dependencies in the preview are preserved.
+It never touches the production/original `Dentico` XAMPP folder.
+
+Review the source before running locally. If PHP business logic or
+database migrations change, additional smoke testing is still required.
