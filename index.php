@@ -33,7 +33,7 @@ if (empty($_SESSION['contact_csrf_token'])) {
         <section class="dc-hero" id="home" aria-labelledby="home-heading">
             <div class="dc-container dc-hero__center">
                 <div class="dc-hero__mark" aria-hidden="true">
-                    <svg viewBox="0 0 240 240" focusable="false"><use xlink:href="assets/img/svg/symbols.svg#hero-img"></use></svg>
+                    <svg viewBox="0 0 116.618 116.619" focusable="false"><use xlink:href="assets/img/svg/symbols.svg#hero-img"></use></svg>
                 </div>
                 <p class="dc-hero__eyebrow">Welcome to</p>
                 <h1 id="home-heading">Dentico</h1>
