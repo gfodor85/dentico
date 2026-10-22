@@ -91,3 +91,21 @@ transactions unchanged. The contact form retains its existing POST action and to
 7. Ensure Maps stays optional when no restricted API key is configured.
 
 This stylesheet does not require a CSS build step.
+
+### One-click Windows preview refresh
+
+After the initial branch checkout, run `git pull --ff-only origin
+feature/ui-refresh-2026` once to acquire the helper scripts. Thereafter,
+double-click `tools/Refresh-Dentico-Preview.cmd`. It calls
+`tools/refresh-preview.ps1` to fast-forward the **UI feature branch** and
+copy its working files into `D:\\WEB_DEV\\xampp\\htdocs\\Dentico-Preview`.
+
+The helper refuses to run if the wrong branch is checked out, the local working
+tree is dirty, or the preview folder does not exist. It uses `robocopy /E`
+(not `/MIR`), so it does **not delete** preview-only files. It excludes
+`.git`, `config`, `vendor`, `.codex` and `tools`; local DB/admin/mail/maps
+config and installed Composer dependencies in the preview are preserved.
+It never touches the production/original `Dentico` XAMPP folder.
+
+Review the source before running locally. If PHP business logic or
+database migrations change, additional smoke testing is still required.
