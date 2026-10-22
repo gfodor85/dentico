@@ -31,21 +31,21 @@ if (empty($_SESSION['contact_csrf_token'])) {
 
     <main>
         <section class="dc-hero" id="home" aria-labelledby="home-heading">
-            <div class="dc-container dc-hero__grid">
-                <div class="dc-hero__copy">
-                    <span class="dc-kicker">Welcome to Dentico</span>
-                    <h1 id="home-heading">A little more care.<br><em>A lot more smile.</em></h1>
-                    <p class="dc-lead">A simpler way to explore dental treatments and plan your next visit. Choose a service, request a convenient time, and hear back from the clinic.</p>
-                    <div class="dc-hero__actions">
-                        <a class="dc-btn" href="booking.php">Request an appointment <span aria-hidden="true">&rarr;</span></a>
-                        <a class="dc-btn dc-btn--light" href="services.php">Explore treatments</a>
-                    </div>
-                    <p class="dc-hero__note">Appointment requests are reviewed before confirmation.</p>
+            <div class="dc-container dc-hero__center">
+                <div class="dc-hero__mark" aria-hidden="true">
+                    <svg viewBox="0 0 240 240" focusable="false"><use xlink:href="assets/img/svg/symbols.svg#hero-img"></use></svg>
                 </div>
-                <div class="dc-hero__visual" role="img" aria-label="Dentico dental clinic illustration">
-                    <div class="dc-hero__floating"><span aria-hidden="true">&#10003;</span> A clear, simple way to plan your visit</div>
+                <p class="dc-hero__eyebrow">Welcome to</p>
+                <h1 id="home-heading">Dentico</h1>
+                <p class="dc-hero__tagline">Your Smile. Our Passion.</p>
+                <p class="dc-hero__intro">Explore dental treatments and request a convenient appointment in just a few steps.</p>
+                <div class="dc-hero__actions">
+                    <a class="dc-btn" href="booking.php">Request an appointment <span aria-hidden="true">&rarr;</span></a>
+                    <a class="dc-btn dc-btn--light" href="services.php">Explore treatments</a>
                 </div>
+                <p class="dc-hero__note">Requests are reviewed by the clinic before confirmation.</p>
             </div>
+            <a href="#treatments" class="dc-hero__scroll">Explore Dentico <span aria-hidden="true">&darr;</span></a>
         </section>
 
         <section class="dc-section" id="treatments" aria-labelledby="services-heading">
@@ -59,19 +59,19 @@ if (empty($_SESSION['contact_csrf_token'])) {
                 </div>
                 <div class="dc-grid-3">
                     <article class="dc-feature">
-                        <div class="dc-feature__number" aria-hidden="true">01</div>
+                        <img class="dc-feature__art" src="assets/img/general_care.png" alt="" loading="lazy" width="154" height="154">
                         <h3>General care</h3>
                         <p>Start with the essentials and explore everyday dental-care options.</p>
                         <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
                     </article>
                     <article class="dc-feature">
-                        <div class="dc-feature__number" aria-hidden="true">02</div>
+                        <img class="dc-feature__art" src="assets/img/cosmetic_dentistry.png" alt="" loading="lazy" width="154" height="154">
                         <h3>Cosmetic dentistry</h3>
                         <p>Learn about treatment choices focused on the appearance of your smile.</p>
                         <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
                     </article>
                     <article class="dc-feature">
-                        <div class="dc-feature__number" aria-hidden="true">03</div>
+                        <img class="dc-feature__art" src="assets/img/restorative_dentistry.png" alt="" loading="lazy" width="154" height="154">
                         <h3>Restorative dentistry</h3>
                         <p>Explore options for maintaining or restoring dental function.</p>
                         <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
