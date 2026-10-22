@@ -2,7 +2,7 @@
     <div class="dc-container dc-topbar__inner">
         <a class="dc-brand" href="index.php" aria-label="Dentico home">
             <span class="dc-brand__icon" aria-hidden="true">
-                <svg viewBox="0 0 240 240" focusable="false"><use xlink:href="assets/img/svg/symbols.svg#hero-img"></use></svg>
+                <svg viewBox="0 0 116.618 116.619" focusable="false"><use xlink:href="assets/img/svg/symbols.svg#hero-img"></use></svg>
             </span>
             <span>Dentico</span>
         </a>
