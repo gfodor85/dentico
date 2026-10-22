@@ -1,32 +1,22 @@
-
-<!-- FORM -->
-<div class="container form-container" id="contact">
-<h2>Do you have any question? Leave Us a message!</h2>
-
-<div class="row justify-content-center">
-    <div class="col-md-6 col-md-offset-3">
-
-        <form id="contact-form" method="post" action="assets/php/contact-form/handler.php">
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['contact_csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
-
-            <div class="from-group">
-                <input class="form-control" type="text" name="name" placeholder="Please add your name" required>
-            </div><br>
-            <div class="from-group">
-                <input class="form-control" type="text" name="subject" placeholder="Subject" required>
-            </div><br>
-            <div class="from-group">
-                <input class="form-control" type="email" name="email" placeholder="Please add your email address" required>
-            </div><br>
-            <div class="from-group">
-                <textarea class="form-control" name="message" id="message" rows="5" placeholder="Your Message" required></textarea>
-            </div><br>
-
-            <button class="btn btn-form" type="submit" name="send">Send Message</button>
-            
-        </form>
-
-
+<form class="dc-contact__form" id="contact-form" method="post" action="assets/php/contact-form/handler.php">
+    <h3>Send us a message</h3>
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['contact_csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+    <div class="dc-field">
+        <label for="contact-name">Your name</label>
+        <input id="contact-name" name="name" type="text" maxlength="120" autocomplete="name" required>
     </div>
-</div>
-</div>
+    <div class="dc-field">
+        <label for="contact-subject">Subject</label>
+        <input id="contact-subject" name="subject" type="text" maxlength="200" required>
+    </div>
+    <div class="dc-field">
+        <label for="contact-email">Email address</label>
+        <input id="contact-email" name="email" type="email" maxlength="254" autocomplete="email" required>
+    </div>
+    <div class="dc-field">
+        <label for="contact-message">Your message</label>
+        <textarea id="contact-message" name="message" rows="5" maxlength="5000" required></textarea>
+    </div>
+    <p class="dc-form-hint">Please do not include sensitive medical information. For an appointment request, use the booking form.</p>
+    <button class="dc-btn" type="submit" name="send" value="1">Send message <span aria-hidden="true">&rarr;</span></button>
+</form>
