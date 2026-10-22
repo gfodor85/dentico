@@ -329,8 +329,8 @@ body.dentico-admin .admin-page > header { padding: 55px 0 30px; margin: 0 !impor
   margin: 0 auto 18px;
   display: grid;
   place-items: center;
-  width: clamp(92px, 12vw, 144px);
-  height: clamp(92px, 12vw, 144px);
+  width: clamp(120px, 16vw, 206px);
+  height: clamp(120px, 16vw, 206px);
   filter: drop-shadow(0 8px 13px rgba(0,0,0,.25));
 }
 .dc-hero__mark svg { display: block; width: 100%; height: 100%; fill: white; }
