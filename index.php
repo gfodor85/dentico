@@ -17,389 +17,146 @@ if (empty($_SESSION['contact_csrf_token'])) {
 }
 ?>
 <!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" lang="">
-<!--<![endif]-->
-
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Dentico</title>
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-    <meta name="author" content="György Fodor, George Fodor">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="icon" href="favicon.ico?v=2" />
-
-
-    <link rel="stylesheet" type="text/css" href="assets/css/main.css">
-
-    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/Swiper/3.3.1/css/swiper.css'>
-    
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-        crossorigin="anonymous">
-   
-    <!-- Modernizr -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
-
-    <!-- Google reCAPTCHA>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script>
-    function onSubmit(token) {
-        document.getElementById("contact-form").submit();
-    }
-    </script --> 
-
+    <meta name="description" content="Explore Dentico dental services and request an appointment online.">
+    <title>Dentico | Thoughtful dental care</title>
+    <link rel="icon" href="favicon.ico?v=2">
+    <link rel="stylesheet" href="assets/css/dentico-ui.css">
 </head>
+<body class="dentico-home">
+    <?php include __DIR__ . '/partials/ui-header.php'; ?>
 
-<body>
-    <!--[if lt IE 8]>
-        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
-
-
-    <?php include 'partials/navigation.php';?>
-
-    <header id="home">
-        
-        <div class="hero-img_container">
-            <svg class="hero-img">
-                <use xlink:href="assets/img/svg/symbols.svg#hero-img"></use>
-            </svg>
-        </div>
-
-        <div>
-            <div class="hero-text">Dentico</div>
-            <div class="slogen">Your Smile. Our Passion.</div>
-        </div>
-
-    </header>
-
-    <!-- <div class="slider" id="panel">Hello world!</div> -->
-
-    <div class="container treatment_type_container slider">
-        <div class="row">
-            <div class="col-lg-4" data-toggle="modal" data-target="#general_care">
-                    <div class="treatment_type_col">
-                        <div class="treatment_type_box">
-                            <div class="text-top"><h5>General Care</h5></div>
-                            <div class="text-bottom"><h6>Click for details</h6></div>
-                        </div>
-                        <img src="assets/img/general_care.png">
+    <main>
+        <section class="dc-hero" id="home" aria-labelledby="home-heading">
+            <div class="dc-container dc-hero__grid">
+                <div class="dc-hero__copy">
+                    <span class="dc-kicker">Welcome to Dentico</span>
+                    <h1 id="home-heading">A little more care.<br><em>A lot more smile.</em></h1>
+                    <p class="dc-lead">A simpler way to explore dental treatments and plan your next visit. Choose a service, request a convenient time, and hear back from the clinic.</p>
+                    <div class="dc-hero__actions">
+                        <a class="dc-btn" href="booking.php">Request an appointment <span aria-hidden="true">&rarr;</span></a>
+                        <a class="dc-btn dc-btn--light" href="services.php">Explore treatments</a>
                     </div>
-            </div>
-
-            <div class="col-lg-4" data-toggle="modal" data-target="#general_care">
-                    <div class="treatment_type_col">
-                        <div class="treatment_type_box">
-                            <div class="text-top"><h5>Cosmetic Dentistry</h5></div>
-                            <div class="text-bottom"><h6>Click for details</h6></div>
-                        </div>
-                        <img src="assets/img/cosmetic_dentistry.png">
-                    </div>
-            </div>
-
-            <div class="col-lg-4" data-toggle="modal" data-target="#general_care">
-                    <div class="treatment_type_col">
-                        <div class="treatment_type_box">
-                            <div class="text-top"><h5>Restorative Dentistry</h5></div>
-                            <div class="text-bottom"><h6>Click for details</h6></div>
-                        </div>
-                        <img src="assets/img/restorative_dentistry.png">
-                    </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- About Us -->
-
-    <section id="about" class="about_us_container">
-        <div class="container">
-            <div class="row">
-
-                <div class="col-md-12 about_content hideme">
-                    
-                    <h4 class="text-center">About Us<hr class="default-hr"></h4>
-                    
-                    <div class="row">
-                        <div class="col-md-5 text-center">
-                            <img class="team_img" src="assets/img/about_us.jpg">
-                        </div>
-                        <div class="col-md-7">
-                            <p class="about_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p></div>
-                    </div>
-                    
-                    <h4 class="text-center">Our Team<hr class="default-hr"></h4>
-                    <div class="row doctors">
-                        
-                        
-                        <div class="col-md-4 text-center">
-                            <h5>Dr. John Doe</h5>
-                            <h6>Chief Medical Officer</h6>
-                            <div class="phone">
-                                <i class="fa fa-phone fa-lg"></i>
-                                <i class="heading_extra_light">1-800-1234-567</i>
-                            </div>
-                            <img class="doc_img" src="assets/img/doc_1.jpg">
-                        </div>
-
-                        <div class="col-md-4 text-center">
-                            <h5>Dr. Jane Doe</h5>
-                            <h6>Dental Hygienist</h6>
-                            <div class="phone">
-                                <i class="fa fa-phone fa-lg"></i>
-                                <i class="heading_extra_light">1-800-1234-567</i>
-                            </div>
-                            <img class="doc_img" src="assets/img/doc_2.jpg">
-                        </div>
-
-                        <div class="col-md-4 text-center">
-                            <h5>Sara Doe</h5>
-                            <h6>Practical Nurse</h6>
-                            <div class="phone">
-                                <i class="fa fa-phone fa-lg"></i>
-                                <i class="heading_extra_light">1-800-1234-567</i>
-                            </div>
-                            <img class="doc_img" src="assets/img/doc_3.jpg">
-                        </div>
-                        
-                    </div>
-
+                    <p class="dc-hero__note">Appointment requests are reviewed before confirmation.</p>
                 </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <?php include 'partials/carousel.php';?>
-
-    <!-- Prices -->
-    <div id="prices" class="prices_container">
-        <div class="container">
-            <h4 class="text-center">Our Prices<hr class="default-hr"></h4>
-            <div class="row">
-                
-              <div class="col-lg-6 prices_slide_left">
-                  <table class="table table-hover borderless">
-                      <tbody>
-                          <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                          <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                          <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                          <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                          <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                    </tbody>
-                  </table>
-            </div>
-                
-                <div class="col-lg-6 prices_slide_right">
-                      <table class="table table-hover borderless">
-                        
-                        <tbody>
-                          <tr>
-                            <td class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                          <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                          <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                          <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                        <tr>
-                            <td  class="price_text">Lorem ipsum dolor sit amet</td>
-                            <td class="price_number">$ 14.00</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                <div class="dc-hero__visual" role="img" aria-label="Dentico dental clinic illustration">
+                    <div class="dc-hero__floating"><span aria-hidden="true">&#10003;</span> A clear, simple way to plan your visit</div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- CONTACT FORM -->
-    <?php include 'partials/form.php';?>
-    
-    <!-- MAP -->
-    <?php include 'partials/map.php';?>
-
-    <!-- Social Icons -->
-    <div class="soc_icons_container">
-        <div class="container">
-            <!-- Social -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <ul>
-                        <li class="fa fa-facebook-official"></li>
-                        <li class="fa fa-google-plus"></li>
-                        <li class="fa fa-linkedin-square"></li>
-                    </ul>
-
+        <section class="dc-section" id="treatments" aria-labelledby="services-heading">
+            <div class="dc-container">
+                <div class="dc-section-heading">
+                    <div>
+                        <span class="dc-kicker">Explore care</span>
+                        <h2 id="services-heading">Discover your options</h2>
+                    </div>
+                    <p>Browse the services available through our online appointment request system.</p>
+                </div>
+                <div class="dc-grid-3">
+                    <article class="dc-feature">
+                        <div class="dc-feature__number" aria-hidden="true">01</div>
+                        <h3>General care</h3>
+                        <p>Start with the essentials and explore everyday dental-care options.</p>
+                        <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                    </article>
+                    <article class="dc-feature">
+                        <div class="dc-feature__number" aria-hidden="true">02</div>
+                        <h3>Cosmetic dentistry</h3>
+                        <p>Learn about treatment choices focused on the appearance of your smile.</p>
+                        <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                    </article>
+                    <article class="dc-feature">
+                        <div class="dc-feature__number" aria-hidden="true">03</div>
+                        <h3>Restorative dentistry</h3>
+                        <p>Explore options for maintaining or restoring dental function.</p>
+                        <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                    </article>
                 </div>
             </div>
-            <div class="line"></div>
-        </div>
-    </div>
+        </section>
 
-    <!-- Footer -->
-    <footer>
-        <span>Dentico © <?php echo date(" Y");?> All Rights Reserved by George Fodor</span>
+        <section class="dc-section dc-about" id="about" aria-labelledby="about-heading">
+            <div class="dc-container dc-about__layout">
+                <div class="dc-about__art" role="img" aria-label="Dental care setting"></div>
+                <div>
+                    <span class="dc-kicker">Simple from the start</span>
+                    <h2 id="about-heading">An easier way to arrange your visit</h2>
+                    <p class="dc-lead">Dentico brings treatment information and appointment requests together in one place. Your selected time is a request until the clinic confirms it.</p>
+                    <ol class="dc-steps">
+                        <li><b aria-hidden="true">1</b><div><strong>Select a treatment</strong><div>See the services and their planned durations.</div></div></li>
+                        <li><b aria-hidden="true">2</b><div><strong>Choose a suitable time</strong><div>Available times appear in 15-minute increments.</div></div></li>
+                        <li><b aria-hidden="true">3</b><div><strong>Wait for confirmation</strong><div>The clinic reviews your request before confirming the appointment.</div></div></li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <section class="dc-cta" aria-labelledby="ready-heading">
+            <div class="dc-container dc-cta__inner">
+                <div>
+                    <h2 id="ready-heading">Ready to request your next visit?</h2>
+                    <p>Monday–Friday, 08:00–17:00. Browse availability online.</p>
+                </div>
+                <a class="dc-btn dc-btn--light" href="booking.php">Find an appointment time <span aria-hidden="true">&rarr;</span></a>
+            </div>
+        </section>
+
+        <section class="dc-section dc-contact" id="contact" aria-labelledby="contact-heading">
+            <div class="dc-container dc-contact__layout">
+                <div class="dc-contact__info">
+                    <span class="dc-kicker">Get in touch</span>
+                    <h2 id="contact-heading">Have a question?</h2>
+                    <p class="dc-lead">Use the form to send a general enquiry. For a visit, please use the dedicated appointment request page.</p>
+                    <div class="dc-contact__hours">
+                        <strong>Appointment hours</strong>
+                        <p>Monday–Friday<br>08:00–17:00</p>
+                        <a class="dc-inline-link" href="booking.php">Request an appointment &rarr;</a>
+                    </div>
+                </div>
+                <?php include __DIR__ . '/partials/form.php'; ?>
+            </div>
+        </section>
+
+        <?php
+        // Public browser keys must be restricted by Google Cloud API and HTTP referrer.
+        $mapsApiKey = trim((string) (getenv('GOOGLE_MAPS_API_KEY') ?: ''));
+        $mapsConfigPath = __DIR__ . '/config/maps.php';
+        if (is_file($mapsConfigPath)) {
+            $mapsConfig = require $mapsConfigPath;
+            if (is_array($mapsConfig) && is_string($mapsConfig['api_key'] ?? null)) {
+                $localMapsKey = trim($mapsConfig['api_key']);
+                if ($localMapsKey !== '') {
+                    $mapsApiKey = $localMapsKey;
+                }
+            }
+        }
+        ?>
+        <?php if ($mapsApiKey !== ''): ?>
+            <section class="dc-map" aria-label="Clinic location map">
+                <div class="dc-container">
+                    <h2>Map preview</h2>
+                    <p>Demo map location. Configure the correct clinic coordinates before deploying this website.</p>
+                    <div id="map"></div>
+                </div>
+            </section>
+        <?php endif; ?>
+    </main>
+
+    <footer class="dc-footer">
+        <div class="dc-container dc-footer__inner">
+            <span>&copy; <?= date('Y') ?> Dentico. Demo website.</span>
+            <span><a href="services.php">Treatments</a> &nbsp;·&nbsp; <a href="booking.php">Appointments</a></span>
+        </div>
     </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-<!-- Bootstrap 4 scripts -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
- <!-- HandlebarsJS -->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
-
- <!-- Swiper JS -->
- <script src='https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.1.0/js/swiper.min.js'></script>
- 
- <!-- Navigation scripts -->
- <script src='assets/js/nav.js'></script>
- 
- <!-- Functions scripts -->
- <script src='assets/js/functions.js'></script>
-
-<!-- Initialize Swiper -->
-<script>
-    var swiper = new Swiper('.swiper-container', {
-        effect: 'coverflow',
-        grabCursor: true,
-        centeredSlides: true,
-        slidesPerView: 'auto',
-        mousewheelControl: true,
-        coverflow: {
-            rotate: 20,
-            stretch: -20,
-            depth: 250,
-            modifier: 1,
-            slideShadows: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-    });
-</script>
-
-<script>
-    $(document).ready(function () {
-        $(".carousel_modal").click(function () {
-            $(this).fadeOut("slow");
-        });
-    });
-</script>
-
-<!-- Google Maps API -->
-<script src='assets/js/map.js'></script>
-
-<?php
-// Google Maps JavaScript keys are visible in the browser: restrict the key
-// by HTTP referrer and API in Google Cloud, even when configured locally.
-$mapsApiKey = trim((string) (getenv('GOOGLE_MAPS_API_KEY') ?: ''));
-$mapsConfigPath = __DIR__ . '/config/maps.php';
-if (is_file($mapsConfigPath)) {
-    $mapsConfig = require $mapsConfigPath;
-    if (is_array($mapsConfig) && is_string($mapsConfig['api_key'] ?? null)) {
-        $localMapsKey = trim($mapsConfig['api_key']);
-        if ($localMapsKey !== '') {
-            $mapsApiKey = $localMapsKey;
-        }
-    }
-}
-?>
-<?php if ($mapsApiKey !== ''): ?>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=<?= htmlspecialchars($mapsApiKey, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>&amp;callback=initMap"
-  type="text/javascript"></script>
-<?php endif; ?>
-
-
-<!-- Modal -->
-<div id="general_care" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">General Care</h4>
-            </div>
-            <div class="modal-body">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="cosmetic_dentistry" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Cosmetic Dentistry</h4>
-            </div>
-            <div class="modal-body">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="rest_dentistry" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Restorative Dentistry</h4>
-            </div>
-            <div class="modal-body">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
+    <?php if ($mapsApiKey !== ''): ?>
+        <script src="assets/js/map.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=<?= htmlspecialchars($mapsApiKey, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>&amp;callback=initMap"></script>
+    <?php endif; ?>
 </body>
-
 </html>
