@@ -4,7 +4,7 @@
 - Dentico is a PHP 8.0+ and MySQL dental-clinic website with a public appointment request flow and a password-protected administrative interface. It also uses HTML, CSS, JavaScript and PHPMailer via Composer.
 - The developer uses Windows/XAMPP. Typical local project path: `D:\WEB_DEV\xampp\htdocs\Dentico`; URL: `http://localhost/Dentico/`. The local database is `dentico`, managed via phpMyAdmin.
 - Read `README.md`, `database/schema.sql`, `composer.json`, and `docs/CODEX_HANDOFF.md` before making changes.
-- The GitHub default branch `master` is not the newest PHP development baseline. `feature/php-pdo-foundation` contains the PHP/MySQL work, and `feature/admin-logout-security` additionally contains the latest logout fix. This handoff branch (`feature/codex-handoff`) is based on that latest fix. Verify branch ancestry and the desired PR target before proposing a merge.
+- As of 2026-10-22, PR #12 has merged the PHP/MySQL booking system and security hardening into `master`. Current unmerged UI work is on `feature/ui-refresh-2026` (draft PR #13, base `master`). Start UI tasks on that feature branch; do not merge PR #13 without owner approval. Ignore obsolete branch guidance further down in older documents where it conflicts with this date.
 
 ## Architecture and behavior to preserve
 - `index.php`, `services.php`: public site; `booking.php`: appointment requests; `available-slots.php`: availability endpoint; `admin.php`: administrative authentication, calendar, and status updates.
@@ -22,8 +22,16 @@
 - Avoid unrelated formatting and refactoring. Keep existing public pages and booking/admin flows working.
 
 ## Workflow and validation
-- First task: read-only architectural, security, and quality audit; report prioritized, actionable findings and their file locations. Do not edit application code during that first audit.
+- The initial Codex read-only audit and security-hardening cycle already happened. For the current UI-design task, inspect the relevant files and make focused code changes on `feature/ui-refresh-2026`; avoid redundant audits unless requested.
 - For subsequent tasks, create dedicated branches and reviewable pull requests; never merge or deploy without owner approval.
 - After PHP changes, run `php -l` on every changed PHP file if PHP is available. Run other relevant automated checks when available and report exact commands/results.
 - Local XAMPP/MySQL and SMTP tests require a configured environment and should not be claimed as passed if not actually performed. Provide a practical manual test checklist for the owner.
 - Summarize what changed, why, tests performed/not performed, security implications, and any required local configuration or schema migration.
+
+## Current UI design direction and preview workflow (2026-10-22)
+- Keep the **original Dentico** identity prominent: turquoise `#00bbae`, Quicksand typography, original SVG mark, large photo-backed hero, original "Your Smile. Our Passion." slogan, translucent panels, and existing service artwork. Do not replace it with generic blue/white clinic branding.
+- User-approved refinements: no "Welcome to" label; fixed desktop hero photo background; on smaller screens allow scrolling; treatment cards have artwork occupying roughly half their height.
+- Relevant pages: `index.php`, `partials/ui-header.php`, `partials/form.php`, `services.php`, `booking.php`, `admin.php`; modernized styling is in `assets/css/dentico-ui.css`. Preserve the existing PHP/CSRF/SQL/availability/approval logic while changing presentation.
+- Local Git clone: `D:\WEB_DEV\Dentico-GitHub`; **original XAMPP application**: `D:\WEB_DEV\xampp\htdocs\Dentico`; disposable UI preview: `D:\WEB_DEV\xampp\htdocs\Dentico-Preview`.
+- Keep private configuration local and out of Git. Prefer changing the clone, then the existing `tools/Refresh-Dentico-Preview.cmd` / `tools/refresh-preview.ps1` updater; do not overwrite the original XAMPP site. Note that the preview may share the original local MySQL `dentico` DB; avoid mutating database records just to check visuals.
+- User prefers conversational design requests and automatic local edits, not long PowerShell snippets to paste. If the local Codex process has access, carry out edits, necessary checks and preview updates directly.
