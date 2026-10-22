@@ -361,82 +361,15 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Appointment Requests | Dentico Admin</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <style>
-        /* Keep the admin area independent from the site's white-text hero styles. */
-        html {
-            min-height: 100%;
-            background: #f3f6fa;
-        }
-        body.admin-body {
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            background: #f3f6fa !important;
-            color: #212529 !important;
-            font-family: Arial, sans-serif !important;
-            overflow-x: hidden;
-        }
-        body.admin-body h1,
-        body.admin-body h2,
-        body.admin-body h3,
-        body.admin-body h4,
-        body.admin-body h5,
-        body.admin-body h6,
-        body.admin-body p,
-        body.admin-body label,
-        body.admin-body strong,
-        body.admin-body .small,
-        body.admin-body .request-meta {
-            color: #212529;
-        }
-        body.admin-body a { color: #0056b3; }
-        body.admin-body a:hover { color: #003d80; }
-        main.admin-page {
-            display: block;
-            width: 100%;
-            max-width: none;
-            min-height: 100vh;
-            margin: 0;
-            padding: 3rem 24px;
-            background-color: rgba(243, 246, 250, 0.78);
-            background-image: url("assets/img/bg_2_blurred.jpg");
-            background-position: center center;
-            background-size: cover;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            color: #212529;
-        }
-        .admin-panel {
-            padding: 1.5rem;
-            border: 1px solid #d7dee7;
-            border-radius: .5rem;
-            background: rgba(255, 255, 255, 0.60) !important;
-            color: #212529;
-        }
-        .request-card {
-            border: 1px solid #d7dee7;
-            border-radius: .4rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: rgba(255, 255, 255, 0.60) !important;
-            color: #212529;
-        }
-        .request-meta { color: #495057 !important; font-size: .9rem; }
-        .admin-login { max-width: 460px; }
-        .request-note { white-space: pre-wrap; overflow-wrap: anywhere; }
-        body.admin-body .text-muted { color: #5b6570 !important; }
-        body.admin-body .alert-success { color: #155724; }
-        @media (max-width: 576px) {
-            main.admin-page { padding: 1.5rem 12px; }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/dentico-ui.css">
 </head>
-<body class="admin-body">
+<body class="admin-body dentico-admin">
+<?php include __DIR__ . '/partials/ui-header.php'; ?>
 <main class="container-fluid admin-page">
-    <p><a href="index.php">&larr; Back to Dentico homepage</a></p>
     <header class="mb-4">
-        <h1>Dentico Admin</h1>
-        <p>Appointment request management</p>
+        <span class="dc-kicker">Clinic workspace</span>
+        <h1>Appointment dashboard</h1>
+        <p>Review incoming requests and manage confirmed visits in one place.</p>
     </header>
 
     <?php if (!$configExists || !$hasPasswordHash): ?>
@@ -474,7 +407,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
             </section>
         <?php else: ?>
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <p class="mb-0">Requests: <strong><?= $totalRequests ?></strong></p>
+                <p class="admin-summary mb-0">Total requests <strong><?= $totalRequests ?></strong></p>
                 <form method="post" action="admin.php">
                     <input type="hidden" name="csrf_token" value="<?= adminEscape($_SESSION['admin_csrf_token']) ?>">
                     <button class="btn btn-outline-secondary btn-sm" type="submit" name="logout" value="1">Sign out</button>
@@ -498,18 +431,18 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                     </nav>
                 </div>
                 <p class="small text-muted">Confirmed appointments only. Opening hours: Monday–Friday, 08:00–17:00.</p>
-                <div class="row">
+                <div class="calendar-days">
                     <?php for ($dayOffset = 0; $dayOffset < 5; $dayOffset++): ?>
                         <?php $calendarDay = $weekStart->modify('+' . $dayOffset . ' days'); ?>
                         <?php $calendarDate = $calendarDay->format('Y-m-d'); ?>
-                        <div class="col-md-6 col-lg mb-3">
-                            <div class="border rounded p-2 h-100">
+                        <div class="calendar-day">
+                            <div class="calendar-day__content">
                                 <h3 class="h6 mb-2"><?= $calendarDay->format('D, M j') ?></h3>
                                 <?php if (empty($confirmedByDate[$calendarDate])): ?>
                                     <p class="small text-muted mb-0">No confirmed appointments</p>
                                 <?php else: ?>
                                     <?php foreach ($confirmedByDate[$calendarDate] as $calendarRequest): ?>
-                                        <div class="alert alert-success p-2 mb-2">
+                                        <div class="calendar-appointment">
                                             <strong><?= substr((string) $calendarRequest['requested_time'], 0, 5) ?></strong>
                                             <div class="small"><?= adminEscape($calendarRequest['patient_name']) ?></div>
                                             <div class="small"><?= adminEscape($calendarRequest['service_name']) ?> · <?= (int) $calendarRequest['duration_minutes'] ?> min</div>
@@ -571,6 +504,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                 if ($lastPage > 1):
                 ?>
                     <nav class="mt-3" aria-label="Request pages">
+                      <ul class="admin-pagination">
                         <li class="page-item <?= $requestPage <= 1 ? 'disabled' : '' ?>">
                             <a class="page-link" href="admin.php?page=<?= max(1, $requestPage - 1) ?>&amp;week=<?= adminEscape($weekStart->format('Y-m-d')) ?>">Previous</a>
                         </li>
@@ -578,6 +512,7 @@ if (!empty($_SESSION['admin_authenticated']) && $hasPasswordHash) {
                         <li class="page-item <?= $requestPage >= $lastPage ? 'disabled' : '' ?>">
                             <a class="page-link" href="admin.php?page=<?= min($lastPage, $requestPage + 1) ?>&amp;week=<?= adminEscape($weekStart->format('Y-m-d')) ?>">Next</a>
                         </li>
+                      </ul>
                     </nav>
                 <?php endif; ?>
             <?php endif; ?>
