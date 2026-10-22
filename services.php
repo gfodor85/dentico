@@ -32,23 +32,16 @@ function escapeHtml(?string $value): string
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dental Services | Dentico</title>
-    <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <style>
-        .services-page { padding: 5rem 0; min-height: 65vh; }
-        .service-card { height: 100%; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: .5rem; background: #fff; }
-        .service-card h2 { font-size: 1.25rem; }
-        .service-meta { color: #555; font-size: .95rem; }
-        .service-price { font-weight: 600; margin-top: 1rem; }
-        .service-alert { padding: 1rem; border-radius: .35rem; }
-    </style>
+    <link rel="stylesheet" href="assets/css/dentico-ui.css">
 </head>
-<body>
+<body class="dentico-services">
+    <?php include __DIR__ . '/partials/ui-header.php'; ?>
     <main class="container services-page">
-        <p><a href="index.php">&larr; Back to Dentico homepage</a></p>
-        <header class="mb-4">
-            <h1>Our Dental Services</h1>
-            <p>Services currently available in the Dentico database.</p>
+        <header class="dc-page-header mb-4">
+            <span class="dc-kicker">Treatment catalogue</span>
+            <h1>Explore our services</h1>
+            <p class="dc-lead">Find out which treatments are available and how much time to allow. Appointments are confirmed after a request is reviewed.</p>
         </header>
 
         <?php if ($loadError): ?>
@@ -81,6 +74,7 @@ function escapeHtml(?string $value): string
                                     Price: To be confirmed
                                 <?php endif; ?>
                             </p>
+                            <div class="service-card__cta"><a class="dc-btn dc-btn--outline" href="booking.php">Request an appointment &rarr;</a></div>
                         </article>
                     </div>
                 <?php endforeach; ?>
