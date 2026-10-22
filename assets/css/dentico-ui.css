@@ -481,3 +481,10 @@ body.dentico-booking .booking-form,
   .dentico-home .dc-hero__actions .dc-btn { width: 100%; }
   body.dentico-booking, body.dentico-services, body.dentico-admin { background-attachment: scroll !important; }
 }
+
+/* Fixed hero background on desktop */
+@media (min-width: 601px) {
+  .dentico-home .dc-hero {
+    background-attachment: fixed;
+  }
+}

@@ -35,7 +35,6 @@ if (empty($_SESSION['contact_csrf_token'])) {
                 <div class="dc-hero__mark" aria-hidden="true">
                     <svg viewBox="0 0 116.618 116.619" focusable="false"><use xlink:href="assets/img/svg/symbols.svg#hero-img"></use></svg>
                 </div>
-                <p class="dc-hero__eyebrow">Welcome to</p>
                 <h1 id="home-heading">Dentico</h1>
                 <p class="dc-hero__tagline">Your Smile. Our Passion.</p>
                 <p class="dc-hero__intro">Explore dental treatments and request a convenient appointment in just a few steps.</p>
