@@ -58,22 +58,34 @@ if (empty($_SESSION['contact_csrf_token'])) {
                 </div>
                 <div class="dc-grid-3">
                     <article class="dc-feature">
-                        <img class="dc-feature__art" src="assets/img/general_care.png" alt="" loading="lazy" width="154" height="154">
-                        <h3>General care</h3>
-                        <p>Start with the essentials and explore everyday dental-care options.</p>
-                        <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                        <div class="dc-feature__media">
+                            <img class="dc-feature__art" src="assets/img/general_care.png" alt="" loading="lazy" width="154" height="154">
+                        </div>
+                        <div class="dc-feature__body">
+                            <h3>General care</h3>
+                            <p>Start with the essentials and explore everyday dental-care options.</p>
+                            <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                        </div>
                     </article>
                     <article class="dc-feature">
-                        <img class="dc-feature__art" src="assets/img/cosmetic_dentistry.png" alt="" loading="lazy" width="154" height="154">
-                        <h3>Cosmetic dentistry</h3>
-                        <p>Learn about treatment choices focused on the appearance of your smile.</p>
-                        <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                        <div class="dc-feature__media">
+                            <img class="dc-feature__art" src="assets/img/cosmetic_dentistry.png" alt="" loading="lazy" width="154" height="154">
+                        </div>
+                        <div class="dc-feature__body">
+                            <h3>Cosmetic dentistry</h3>
+                            <p>Learn about treatment choices focused on the appearance of your smile.</p>
+                            <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                        </div>
                     </article>
                     <article class="dc-feature">
-                        <img class="dc-feature__art" src="assets/img/restorative_dentistry.png" alt="" loading="lazy" width="154" height="154">
-                        <h3>Restorative dentistry</h3>
-                        <p>Explore options for maintaining or restoring dental function.</p>
-                        <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                        <div class="dc-feature__media">
+                            <img class="dc-feature__art" src="assets/img/restorative_dentistry.png" alt="" loading="lazy" width="154" height="154">
+                        </div>
+                        <div class="dc-feature__body">
+                            <h3>Restorative dentistry</h3>
+                            <p>Explore options for maintaining or restoring dental function.</p>
+                            <a class="dc-inline-link" href="services.php">View treatments &rarr;</a>
+                        </div>
                     </article>
                 </div>
             </div>
